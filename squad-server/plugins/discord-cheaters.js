@@ -73,7 +73,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
   async cheaterCheck() {
     const logDirectory = this.options.logDir;
     const files = fs.readdirSync(logDirectory).filter(f => f.endsWith('SquadGame.log'));
-    console.log(`Logs found (${files.length}):\n > ${files.join(`\n > `)}`);
+    this.verbose(1, `Logs found (${files.length}):\n > ${files.join(`\n > `)}`);
 
     files.map(async (logFile) => {
       const logPath = path.join(logDirectory, logFile);
@@ -82,7 +82,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
       try {
         await fs.promises.access(logPath, fs.constants.R_OK)
       } catch (error) {
-        console.log(`\n\x1b[1m\x1b[34mUnable to read: \x1b[32m${fileNameNoExt}\x1b[0m`)
+        this.verbose(1, `\n\x1b[1m\x1b[34mUnable to read: \x1b[32m${fileNameNoExt}\x1b[0m`)
       }
 
       await this.drawGraph(logPath, fileNameNoExt);
@@ -270,7 +270,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
         contentBuilding.push({
           row: `### ${serverName} SUSPECTED CHEATER REPORT: ${fileNameNoExt} ###`
         })
-        console.log(`\x1b[1m\x1b[34m### ${serverName} CHEATING REPORT: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`)
+        this.verbose(1, `\x1b[1m\x1b[34m### ${serverName} CHEATING REPORT: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`)
         const cheaters = {
           Explosions: explosionCountersPerController,
           ServerMoveTimeStampExpired: serverMoveTimestampExpiredPerPawn,
@@ -295,7 +295,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
             row: `# == ${cK.toUpperCase()}`
           })
 
-          console.log(`\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31m${cK.toUpperCase()}\x1b[0m`)
+          this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31m${cK.toUpperCase()}\x1b[0m`)
           for (let playerId in cheaters[cK])
             if (cheaters[cK][playerId] > minCount && minCount != 0) {
               let playerName;
@@ -313,18 +313,18 @@ export default class DiscordCheaters extends DiscordBasePlugin {
                 suspectedCheaters.push(playerSteamID);
                 this.uniqueRowsSet.add(row);
                 contentBuilding.push({ row });
-                console.log(`\x1b[1m\x1b[34m#\x1b[0m  > \x1b[33m${playerSteamID}\x1b[90m ${playerController}\x1b[37m ${playerName}\x1b[90m: \x1b[91m${cheaters[cK][playerId]}\x1b[0m`);
+                this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m  > \x1b[33m${playerSteamID}\x1b[90m ${playerController}\x1b[37m ${playerName}\x1b[90m: \x1b[91m${cheaters[cK][playerId]}\x1b[0m`);
               }
             }
         }
         if (suspectedCheaters.length === 0) {
-          this.verbose(1, 'No Suspected Cheaters Found')
+          this.verbose(1, `\x1b[1m\x1b[34m### NO SUSPECTED CHEATERS FOUND: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`)
           return
         } else {
           contentBuilding.push({
             row: `### SUSPECTED CHEATERS SESSIONS: ${fileNameNoExt} ###`
           })
-          console.log(`\x1b[1m\x1b[34m### SUSPECTED CHEATERS SESSIONS: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`)
+          this.verbose(1, `\x1b[1m\x1b[34m### SUSPECTED CHEATERS SESSIONS: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`)
           for (let playerSteamID of suspectedCheaters) {
             const playerControllerHistory = steamIDToPlayerController.get(playerSteamID);
             if (!playerControllerHistory) continue;
@@ -332,7 +332,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
             contentBuilding.push({
               row: `# == ${playerSteamID} | ${playerName}`
             })
-            console.log(`\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[33m${playerSteamID} \x1b[31m${playerName}\x1b[0m`)
+            this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[33m${playerSteamID} \x1b[31m${playerName}\x1b[0m`)
 
             for (let playerController of playerControllerHistory) {
               let stringifiedConnectionTime = connectionTimesByPlayerController[playerController].toLocaleString();
@@ -341,13 +341,13 @@ export default class DiscordCheaters extends DiscordBasePlugin {
               contentBuilding.push({
                 row: `#  >  ${playerController}: (${stringifiedConnectionTime} - ${stringifiedDisconnectionTime})`
               })
-              console.log(`\x1b[1m\x1b[34m#\x1b[0m  > \x1b[90m ${playerController}\x1b[90m: \x1b[91m(${stringifiedConnectionTime} - ${stringifiedDisconnectionTime})\x1b[0m`)
+              this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m  > \x1b[90m ${playerController}\x1b[90m: \x1b[91m(${stringifiedConnectionTime} - ${stringifiedDisconnectionTime})\x1b[0m`)
             }
           }
           contentBuilding.push({
             row: `#### FINISHED ALL REPORTS: ${fileNameNoExt} ###`
           })
-          console.log(`\x1b[1m\x1b[34m#### FINISHED ALL REPORTS: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`)
+          this.verbose(1, `\x1b[1m\x1b[34m#### FINISHED ALL REPORTS: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`)
 
           this.sendDiscordMessage({
             content: '```\n' +
