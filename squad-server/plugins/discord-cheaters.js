@@ -57,7 +57,8 @@ export default class DiscordCheaters extends DiscordBasePlugin {
 
   constructor(server, options, connectors) {
     super(server, options, connectors);
-
+    // Set to store unique rows
+    this.uniqueRowsSet = new Set();
     this.cheaterCheck = this.cheaterCheck.bind(this);
   }
 
@@ -280,14 +281,14 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           let minCount = 200;
           switch (cK) {
             case 'Explosions':
-                minCount = this.options.explosionThreshold;
-                break;
+              minCount = this.options.explosionThreshold;
+              break;
             case 'ServerMoveTimeStampExpired':
-                minCount = this.options.serverMoveTimeStampExpiredThreshold;
-                break;
+              minCount = this.options.serverMoveTimeStampExpiredThreshold;
+              break;
             case 'Kills':
-                minCount = this.options.killsThreshold;
-                break;
+              minCount = this.options.killsThreshold;
+              break;
           }
 
           contentBuilding.push({
@@ -305,12 +306,15 @@ export default class DiscordCheaters extends DiscordBasePlugin {
               playerName = playerControllerToPlayerName[playerController];
               playerSteamID = playerControllerToSteamID[playerController];
 
-              suspectedCheaters.push(playerSteamID);
+              const row = `#  > ${playerSteamID} | ${playerController} | ${playerName}: ${cheaters[cK][playerId]}`;
 
-              contentBuilding.push({
-                row: `#  > ${playerSteamID} | ${playerController} | ${playerName}: ${cheaters[cK][playerId]}`
-              })
-              console.log(`\x1b[1m\x1b[34m#\x1b[0m  > \x1b[33m${playerSteamID}\x1b[90m ${playerController}\x1b[37m ${playerName}\x1b[90m: \x1b[91m${cheaters[cK][playerId]}\x1b[0m`)
+              // Check if the row is already in the set
+              if (!this.uniqueRowsSet.has(row)) {
+                suspectedCheaters.push(playerSteamID);
+                this.uniqueRowsSet.add(row);
+                contentBuilding.push({ row });
+                console.log(`\x1b[1m\x1b[34m#\x1b[0m  > \x1b[33m${playerSteamID}\x1b[90m ${playerController}\x1b[37m ${playerName}\x1b[90m: \x1b[91m${cheaters[cK][playerId]}\x1b[0m`);
+              }
             }
         }
         if (suspectedCheaters.length === 0) {
