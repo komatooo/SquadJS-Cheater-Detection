@@ -6,6 +6,6 @@
     "channelID": "728354522535297064",
     "interval": 300000,
     "explosionThreshold": 200,
-    "serverMoveTimeStampExpiredThreshold": 500,
+    "serverMoveTimeStampExpiredThreshold": 3000,
     "killsThreshold": 100
   }

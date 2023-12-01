@@ -10,4 +10,3 @@
 
 ## Installation
 - Add the bits to your SquadJS
-- You may have to run `npm install` in your SquadJS's directory after adding the files.
