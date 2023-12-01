@@ -280,14 +280,14 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           let minCount = 200;
           switch (cK) {
             case 'Explosions':
-              minCount = this.options.explosionThreshold;
-              break;
+                minCount = this.options.explosionThreshold;
+                break;
             case 'ServerMoveTimeStampExpired':
-              minCount = this.options.serverMoveTimeStampExpiredThreshold;
-              break;
+                minCount = this.options.serverMoveTimeStampExpiredThreshold;
+                break;
             case 'Kills':
-              minCount =this.options.killsThreshold;
-              break;
+                minCount = this.options.killsThreshold;
+                break;
           }
 
           contentBuilding.push({
@@ -296,7 +296,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
 
           console.log(`\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31m${cK.toUpperCase()}\x1b[0m`)
           for (let playerId in cheaters[cK])
-            if (cheaters[cK][playerId] > minCount) {
+            if (cheaters[cK][playerId] > minCount && minCount != 0) {
               let playerName;
               let playerSteamID;
               let playerController;

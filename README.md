@@ -13,3 +13,4 @@
 
 ## Installation
 - Add the bits to your SquadJS
+- Set the Threshold to `0` to Disable one of the Detections.
