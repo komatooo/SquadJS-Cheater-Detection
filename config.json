@@ -1,0 +1,11 @@
+{
+    "plugin": "DiscordCheaters",
+    "enabled": true,
+    "discordClient": "discord",
+    "logDir": "C:/ALL Game Servers/Squad Servers/Third Squad Server/SquadGame/Saved/Logs",
+    "channelID": "728354522535297064",
+    "interval": 300000,
+    "explosionThreshold": 200,
+    "serverMoveTimeStampExpiredThreshold": 500,
+    "killsThreshold": 100
+  }
