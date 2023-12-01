@@ -56,7 +56,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
       killsThreshold: {
         required: false,
         description: 'Kills Detection Threshold.',
-        default: 100
+        default: 200
       }
     };
   }

@@ -8,5 +8,5 @@
     "interval": 300000,
     "explosionThreshold": 200,
     "serverMoveTimeStampExpiredThreshold": 3000,
-    "killsThreshold": 100
+    "killsThreshold": 200
   }
