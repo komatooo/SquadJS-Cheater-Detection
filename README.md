@@ -23,3 +23,6 @@
 
 ## Example Output
 ![Example](https://raw.githubusercontent.com/IgnisAlienus/SquadJS-Cheater-Detection/master/example-output.png)
+
+## Known Issues
+- It's possible that if you set your Detection Thresholds too low that the output text will be longer than 4,000 Characters which will cause an API error with Discord since that will make the message too large to send.
