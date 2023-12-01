@@ -5,6 +5,7 @@
 
 ## Installation
 - Add the bits to your SquadJS
+- If you want to setup Role Pinging use `"pingGroups":  ["723400310667870230", "550182386219089921"],` with your RoleID(s) in place of the example IDs.
 - Set the Threshold to `0` to Disable one of the Detections.
 - I recommend setting your Interval to at least 5 Minutes (300000 milliseconds) apart. There is a small spike on the CPU and Memory at each Interval.
 

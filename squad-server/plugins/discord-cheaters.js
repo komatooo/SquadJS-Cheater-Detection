@@ -21,6 +21,12 @@ export default class DiscordCheaters extends DiscordBasePlugin {
         description: 'Squad Log Directory.',
         default: ''
       },
+      pingGroups: {
+        required: false,
+        description: 'A list of Discord role IDs to ping.',
+        default: [],
+        example: ['500455137626554379']
+      },
       channelID: {
         required: true,
         description: 'The ID of the channel to log to.',
@@ -72,7 +78,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
 
   async cheaterCheck() {
     const logDirectory = this.options.logDir;
-    const files = fs.readdirSync(logDirectory).filter(f => f.endsWith('SquadGame.log'));
+    const files = fs.readdirSync(logDirectory).filter(f => f.endsWith('SquadGameThis.log'));
     this.verbose(1, `Logs found (${files.length}):\n > ${files.join(`\n > `)}`);
 
     files.map(async (logFile) => {
@@ -349,10 +355,13 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           })
           this.verbose(1, `\x1b[1m\x1b[34m#### FINISHED ALL REPORTS: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`)
 
+          let pingables = 'Supsected Cheater Report for Review';
+          if (this.options.pingGroups.length > 0) {
+            pingables = this.options.pingGroups.map((groupID) => `<@&${groupID}>`).join(' ')
+          }
+
           this.sendDiscordMessage({
-            content: '```\n' +
-              `${contentBuilding.map(item => item.row).join('\n')}\n` +
-              '```',
+            content: `${pingables}\n\`\`\`\n${contentBuilding.map(item => item.row).join('\n')}\n\`\`\``,
           });
         }
       })

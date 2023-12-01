@@ -3,6 +3,7 @@
     "enabled": true,
     "discordClient": "discord",
     "logDir": "C:/ALL Game Servers/Squad Servers/Third Squad Server/SquadGame/Saved/Logs",
+    "pingGroups":  ["723400310667870230", "550182386219089921"],
     "channelID": "728354522535297064",
     "interval": 300000,
     "explosionThreshold": 200,
