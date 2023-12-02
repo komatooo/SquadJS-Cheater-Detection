@@ -78,7 +78,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
 
   async cheaterCheck() {
     const logDirectory = this.options.logDir;
-    const files = fs.readdirSync(logDirectory).filter(f => f.endsWith('SquadGameThis.log'));
+    const files = fs.readdirSync(logDirectory).filter(f => f.endsWith('SquadGame.log'));
     this.verbose(1, `Logs found (${files.length}):\n > ${files.join(`\n > `)}`);
 
     files.map(async (logFile) => {
