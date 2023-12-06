@@ -5,6 +5,7 @@
     "logDir": "C:/ALL Game Servers/Squad Servers/Third Squad Server/SquadGame/Saved/Logs",
     "pingGroups":  [],
     "channelID": "728354522535297064",
+    "warnInGameAdmins": true,
     "interval": 300000,
     "explosionThreshold": 200,
     "serverMoveTimeStampExpiredThreshold": 3000,

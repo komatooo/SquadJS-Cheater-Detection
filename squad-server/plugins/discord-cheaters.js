@@ -33,10 +33,11 @@ export default class DiscordCheaters extends DiscordBasePlugin {
         default: '',
         example: '667741905228136459'
       },
-      color: {
+      warnInGameAdmins: {
         required: false,
-        description: 'The color of the embed.',
-        default: 16761867
+        description:
+          'Should in-game admins be warned if a Suspected Cheater is detected.',
+        default: false
       },
       interval: {
         required: false,
@@ -78,7 +79,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
 
   async cheaterCheck() {
     const logDirectory = this.options.logDir;
-    const files = fs.readdirSync(logDirectory).filter(f => f.endsWith('SquadGame.log'));
+    const files = fs.readdirSync(logDirectory).filter(f => f.endsWith('SquadGameThis.log'));
     this.verbose(1, `Logs found (${files.length}):\n > ${files.join(`\n > `)}`);
 
     files.map(async (logFile) => {
@@ -363,6 +364,8 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           this.sendDiscordMessage({
             content: `${pingables}\n\`\`\`\n${contentBuilding.map(item => item.row).join('\n')}\n\`\`\``,
           });
+
+          this.warnInGameAdmins()
         }
       })
 
@@ -370,6 +373,16 @@ export default class DiscordCheaters extends DiscordBasePlugin {
         reject(err);
       });
     });
+  }
+  async warnInGameAdmins() {
+    const admins = await this.server.getAdminsWithPermission('canseeadminchat');
+    let amountAdmins = 0;
+    for (const player of this.server.players) {
+      if (!admins.includes(player.steamID)) continue;
+      amountAdmins++;
+      if (this.options.warnInGameAdmins)
+        await this.server.rcon.warn(player.steamID, `Suspected Cheater Found! Check the Discord Posting!`);
+    }
   }
 }
 
