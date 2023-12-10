@@ -16,13 +16,19 @@
 - If any Suspected Cheaters are found, it pushes it to a configurable Discord Channel.
 
 ## Detection Methods and the Possible False Positives
-- `Explosions:` it's possible for someone to be a false positive on explosions particularly if they're driving around an armor piece such as a BTR spamming HE.
-- `ServerMoveTimeStampExpired:` it's possible for someone to be a false positive on this if they lag a lot or have high ping.
-- `Kills:` this one is obviously possible to easily put out a false positive for the better players.
+- `Explosions`: it's possible for someone to be a false positive on explosions particularly if they're driving around an armor piece such as a BTR spamming HE.
+- `ServerMoveTimeStampExpired`: it's possible for someone to be a false positive on this if they lag a lot or have high ping.
+- `ClientNetSpeed`: Unknown if tied to Cheaters yet. Set Threshold to `0` to Disable.
+- `Kills`: this one is obviously possible to easily put out a false positive for the better players.
 
 ## What in the world is `ServerMoveTimeStampExpired`???
-- The best explanation I can find is from `{ASG} Skillet` in OWI Hosting Discord
+- The best explanation I can find is from `{ASG} Skillet` in OWI Hosting Discord.
 > Cheats exploit a weakness with how the server uses timestamps to determine how much time difference there is between the client and the server. So far whenever there's a cheat (for remote action) the player cheating creates log lines like `[2023.05.11-04.25.07:162][532]LogNetPlayerMovement: Warning: ServerMove: TimeStamp expired: 239.967377, CurrentTimeStamp: 1.065638, Character: BP_Soldier_MIL_Grenadier_C_2147143984`, where if the CurrentTimeStamp is less than the TimeStamp expired then you most likely have a cheater, problem is that these lines are also generated when someone lags a lot, however their timestamp times don't violate the rule stated previously. There is an edge case however where the timestamps circulate back (i think from 255 back to 0), at this point you can have someone not be a cheater but trip the rule, to remedy this you just ignore it if the current timestamp is a small value (say less than 2). When someone cheats using this method they generate a lot of these warnings in the log, you just need to catch one though. You can relate the Character: field to a players character name, this can then let you find their SteamID and username.
+
+## What in the world is `ClientNetSpeed`???
+- Explaination from `-✘- Vohk` in Squad Guardian Discord.
+> Unreal engine parameter that sets the max bandwidth to the client. Too low and you get a lot of desync; too high and it murders TPS. The server setting is supposed to be authoritative but there seems to be some inconsistency. Unclear if it's exploiting, people just setting ini parameters, or just the game making more spaghetti
+I don't think there is anything firm tying it to cheating. I think the thought process was it might be worth tracking, but probably not something that needs to be flagged for admins in the moment.
 
 ## Example Output
 ![Example](https://raw.githubusercontent.com/IgnisAlienus/SquadJS-Cheater-Detection/master/example-output.png)

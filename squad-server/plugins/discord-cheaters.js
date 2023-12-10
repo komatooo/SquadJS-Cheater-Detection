@@ -107,6 +107,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
       const data = new DataStore();
 
       let serverName = '';
+      let serverVersionMajor = 0;
 
       let uniqueClientNetSpeedValues = new Set();
 
@@ -417,17 +418,33 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           let minCount = 200;
           switch (cK) {
             case 'Explosions':
-              minCount = this.options.explosionThreshold;
-              break;
+              if (this.options.explosionThreshold === 0) {
+                break;
+              } else {
+                minCount = this.options.explosionThreshold;
+                break;
+              }
             case 'ServerMoveTimeStampExpired':
-              minCount = this.options.serverMoveTimeStampExpiredThreshold;
-              break;
+              if (this.options.serverMoveTimeStampExpiredThreshold === 0) {
+                break;
+              } else {
+                minCount = this.options.serverMoveTimeStampExpiredThreshold;
+                break;
+              }
             case 'ClientNetSpeed':
-              minCount = this.options.clientNetSpeedThreshold;
-              break;
+              if (this.options.clientNetSpeedThreshold === 0) {
+                break;
+              } else {
+                minCount = this.options.clientNetSpeedThreshold;
+                break;
+              }
             case 'Kills':
-              minCount = this.options.killsThreshold;
-              break;
+              if (this.options.killsThreshold === 0) {
+                break;
+              } else {
+                minCount = this.options.killsThreshold;
+                break;
+              }
           }
 
           contentBuilding.push({
