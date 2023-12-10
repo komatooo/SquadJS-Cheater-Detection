@@ -54,6 +54,11 @@ export default class DiscordCheaters extends DiscordBasePlugin {
         description: 'ServerMoveTimeStampExpired Detection Threshold.',
         default: 3000
       },
+      clientNetSpeedThreshold: {
+        required: false,
+        description: 'Client Net Speed Threshold.',
+        default: 1800
+      },
       killsThreshold: {
         required: false,
         description: 'Kills Detection Threshold.',
@@ -97,13 +102,16 @@ export default class DiscordCheaters extends DiscordBasePlugin {
   }
 
   async drawGraph(logPath, fileNameNoExt) {
+    const startTime = Date.now();
     return new Promise((resolve, reject) => {
       const data = new DataStore();
 
       let serverName = '';
 
+      let uniqueClientNetSpeedValues = new Set();
+
       let explosionCountersPerController = []
-      let serverMoveTimestampExpiredPerPawn = []
+      let serverMoveTimestampExpiredPerController = []
       let pawnsToPlayerNames = []
       let chainIdToPlayerController = []
       let playerNameToPlayerController = []
@@ -113,7 +121,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
       let killsPerPlayerController = []
       let connectionTimesByPlayerController = []
       let disconnectionTimesByPlayerController = []
-
+      let playerControllerToNetspeed = []
 
       const fileStream = fs.createReadStream(logPath);
       const rl = readline.createInterface({
@@ -133,12 +141,14 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           data.addTimePoint(timePoint);
 
           data.setNewCounterValue('tickRate', Math.round(+res[2]))
+          return;
         }
 
         regex = / ServerName: \'(.+)\' RegisterTimeout:/
         res = regex.exec(line);
         if (res) {
           serverName = res[1];
+          return;
         }
 
         regex = /CloseBunch/
@@ -146,12 +156,14 @@ export default class DiscordCheaters extends DiscordBasePlugin {
         if (res) {
           // queuePoints[ queuePoints.length - 1 ].y -= 1;
           data.incrementCounter('queue', -1)
+          return;
         }
 
         regex = /LogSquad: PostLogin: NewPlayer:/;
         res = regex.exec(line);
         if (res) {
           data.incrementCounter('players', 1);
+          return;
         }
 
         regex = /^\[([0-9.:-]+)]\[([ 0-9]*)]LogNet: UChannel::Close: Sending CloseBunch\. ChIndex == [0-9]+\. Name: \[UChannel\] ChIndex: [0-9]+, Closing: [0-9]+ \[UNetConnection\] RemoteAddr: (.+):[0-9]+, Name: (Steam|EOSIp)NetConnection_[0-9]+, Driver: GameNetDriver (Steam|EOS)NetDriver_[0-9]+, IsServer: YES, PC: ([^ ]+PlayerController_C_[0-9]+), Owner: [^ ]+PlayerController_C_[0-9]+/
@@ -159,6 +171,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
         if (res) {
           data.incrementCounter('players', -1);
           disconnectionTimesByPlayerController[res[6]] = getDateTime(res[1])
+          return;
         }
 
         regex = /\[(.+)\].+LogSquad: OnPreLoadMap: Loading map .+\/([^\/]+)$/;
@@ -166,12 +179,14 @@ export default class DiscordCheaters extends DiscordBasePlugin {
         if (res) {
           const timePoint = getDateTime(res[1]);
           data.setNewCounterValue('layers', 150, res[2], timePoint)
+          return;
         }
 
         regex = /\[(.+)\]\[\d+].*LogWorld: SeamlessTravel to: .+\/([^\/]+)$/;
         res = regex.exec(line);
         if (res) {
           data.setNewCounterValue('layers', 150, res[2])
+          return;
         }
 
         regex = /Frag_C.*DamageInstigator=([^ ]+PlayerController_C_\d+) /;
@@ -182,48 +197,100 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           const playerController = res[1];
           if (!explosionCountersPerController[playerController]) explosionCountersPerController[playerController] = 0;
           explosionCountersPerController[playerController]++;
+          return;
         }
 
-        regex = /ServerMove\: TimeStamp expired.+Character: (.+)/;
+        regex = /ServerMove\: TimeStamp expired: ([\d\.]+), CurrentTimeStamp: ([\d\.]+), Character: (.+)/;
         res = regex.exec(line);
         if (res) {
           data.incrementFrequencyCounter('serverMove', 0.05)
 
-          const playerName = pawnsToPlayerNames[res[1]];
+          const timestampExpired = +res[1];
+          const currentTimeStamp = +res[2];
+          const delta = currentTimeStamp - timestampExpired
+          const playerName = pawnsToPlayerNames[res[3]];
           const playerController = playerNameToPlayerController[playerName]
-          if (!serverMoveTimestampExpiredPerPawn[playerController]) serverMoveTimestampExpiredPerPawn[playerController] = 0;
-          serverMoveTimestampExpiredPerPawn[playerController]++;
+          if (delta > 20) {
+            if (!serverMoveTimestampExpiredPerController[playerController]) {
+              // console.log("Found sus player", playerName, res[ 3 ])
+              serverMoveTimestampExpiredPerController[playerController] = 0;
+            }
+            serverMoveTimestampExpiredPerController[playerController]++;
+          }
+          return;
         }
 
         regex = /Warning: UNetConnection::Tick/;
         res = regex.exec(line);
         if (res) {
           data.incrementFrequencyCounter('unetConnectionTick', 1)
+          return;
         }
 
         regex = /SetReplicates called on non-initialized actor/;
         res = regex.exec(line);
         if (res) {
           data.incrementFrequencyCounter('nonInitializedActor', 1)
+          return;
         }
 
         regex = /RotorWashEffectListener/;
         res = regex.exec(line);
         if (res) {
           data.incrementFrequencyCounter('rotorWashEffectListener', 1)
+          return;
         }
 
-        regex = /OnPossess\(\): PC=(.+) Pawn=(.+) FullPath/;
+        regex = /\[(.+)\]\[ ?(\d+)\].+Client netspeed is (\d+)/;
         res = regex.exec(line);
         if (res) {
-          pawnsToPlayerNames[res[2]] = res[1];
+          data.setNewCounterValue('clientNetSpeed', (+res[3]) / 1000)
+          uniqueClientNetSpeedValues.add(+res[3]);
+          const playerController = chainIdToPlayerController[res[2]]
+          if (playerController) {
+            if (!playerControllerToNetspeed[playerController]) playerControllerToNetspeed[playerController] = []
+            playerControllerToNetspeed[playerController].push(+res[3])
+          }
+          return;
         }
 
-        regex = /\[(.+)\]\[ ?(\d+)\]LogSquad: PostLogin: NewPlayer: [^ ]+PlayerController_C.+PersistentLevel\.(.+)/;
-        res = regex.exec(line);
-        if (res) {
-          chainIdToPlayerController[res[2]] = res[3];
-          connectionTimesByPlayerController[res[3]] = getDateTime(res[1])
+        if (serverVersionMajor < 7) {
+          regex = /OnPossess\(\): PC=(.+) Pawn=(.+) FullPath/;
+          res = regex.exec(line);
+          if (res) {
+            pawnsToPlayerNames[res[2]] = res[1];
+          }
+
+          regex = /\[(.+)\]\[ ?(\d+)\]LogSquad: PostLogin: NewPlayer: [^ ]+PlayerController_C.+PersistentLevel\.(.+)/;
+          res = regex.exec(line);
+          if (res) {
+            chainIdToPlayerController[res[2]] = res[3];
+            connectionTimesByPlayerController[res[3]] = getDateTime(res[1])
+          }
+        } else {
+          regex = /^\[([0-9.:-]+)]\[([ 0-9]*)]LogSquad: PostLogin: NewPlayer: BP_PlayerController_C .+PersistentLevel\.(.+) \(IP: ([\d\.]+) \| Online IDs: EOS: (.+) steam: (\d+)\)/;
+          res = regex.exec(line);
+          if (res) {
+            const playerController = res[3];
+
+            chainIdToPlayerController[res[2]] = playerController;
+            connectionTimesByPlayerController[res[3]] = getDateTime(res[1])
+
+            const steamID = res[6];
+            playerControllerToSteamID[playerController] = steamID;
+
+            const playerControllerHistory = steamIDToPlayerController.get(steamID);
+            if (!playerControllerHistory)
+              steamIDToPlayerController.set(steamID, [playerController]);
+            else
+              playerControllerHistory.push(playerController)
+          }
+
+          regex = /OnPossess\(\): PC=(.+) \(Online IDs: EOS: (.+) steam: (\d+)\) Pawn=(.+) FullPath/;
+          res = regex.exec(line);
+          if (res) {
+            pawnsToPlayerNames[res[4]] = res[1];
+          }
         }
 
         regex = /\[.+\]\[ ?(\d+)\]LogSquad: Player (.+) has been added to Team/;
@@ -232,11 +299,13 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           // data.incrementCounter('players', 1);
           playerNameToPlayerController[res[2]] = chainIdToPlayerController[res[1]];
           playerControllerToPlayerName[chainIdToPlayerController[res[1]]] = res[2];
+          return;
         }
         regex = /\[(.+)\]\[ ?(\d+)\]LogNet: Join succeeded: (.+)/;
         res = regex.exec(line);
         if (res) {
           delete chainIdToPlayerController[res[2]];
+          return;
         }
 
         regex = /\[.+\]\[ ?(\d+)\]LogEOS: \[Category: LogEOSAntiCheat\] \[AntiCheatServer\] \[RegisterClient-001\].+AccountId: (\d+) IpAddress/;
@@ -251,36 +320,96 @@ export default class DiscordCheaters extends DiscordBasePlugin {
             const playerControllerHistory = steamIDToPlayerController.get(steamID);
             if (!playerControllerHistory)
               steamIDToPlayerController.set(steamID, [playerController]);
-            else
+            else if (!playerControllerHistory.includes(playerController))
               playerControllerHistory.push(playerController)
           }
+          return;
         }
 
         regex = /Die\(\): Player:.+from (.+) caused by (.+)/;
         res = regex.exec(line);
         if (res) {
-          data.incrementFrequencyCounter('playerDeaths', 0.1)
+          data.incrementFrequencyCounter('playerDeaths', 1 / 5)
           let playerController = res[1]
           if (!playerController || playerController == 'nullptr') {
             playerController = playerNameToPlayerController[pawnsToPlayerNames[res[2]]]
           }
           if (!killsPerPlayerController[playerController]) killsPerPlayerController[playerController] = 0;
           killsPerPlayerController[playerController]++;
+          return;
+        }
+        regex = /LogSquadVoiceChannel: Warning: Unable to find channel for packet sender/;
+        res = regex.exec(line);
+        if (res) {
+          data.incrementFrequencyCounter('unableToFindVoiceChannel', 0.005)
+          return;
+        }
+
+        regex = /DealDamage was called but there was no valid actor or component/;
+        res = regex.exec(line);
+        if (res) {
+          data.incrementFrequencyCounter('dealDamageOnInvalidActorOrComponent', 1)
+          return;
+        }
+
+        regex = /TraceAndMessageClient\(\): SQVehicleSeat::TakeDamage/;
+        res = regex.exec(line);
+        if (res) {
+          data.incrementFrequencyCounter('SQVehicleSeatTakeDamage', 1)
+          return;
+        }
+
+        regex = /LogSquadCommon: SQCommonStatics Check Permissions/;
+        res = regex.exec(line);
+        if (res) {
+          data.incrementFrequencyCounter('SQCommonStaticsCheckPermissions', 1)
+          return;
+        }
+
+        regex = /Updated suppression multiplier/;
+        res = regex.exec(line);
+        if (res) {
+          data.incrementFrequencyCounter('updatedSuppressionMultiplier', 1)
+          return;
+        }
+
+        regex = /PlayerWounded_Implementation\(\): Driver Assist Points:/;
+        res = regex.exec(line);
+        if (res) {
+          data.incrementFrequencyCounter('driverAssistPoints', 1)
+          return;
         }
       })
 
 
       // Cheater Report
       rl.on("close", () => {
+        const endAnalysisTIme = Date.now();
         let contentBuilding = [];
+
+        const endTime = Date.now();
+        const analysisDuration = ((endAnalysisTIme - startTime) / 1000).toFixed(1)
+        const totalDuration = ((endTime - startTime) / 1000).toFixed(1)
 
         contentBuilding.push({
           row: `### ${serverName} SUSPECTED CHEATER REPORT: ${fileNameNoExt} ###`
         })
+
+        contentBuilding.push({
+          row: `# == Analysis duration: ${analysisDuration}`
+        })
+
+        contentBuilding.push({
+          row: `# == Total duration: ${totalDuration}`
+        })
+
+        this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mAnalysis duration:\x1b[0m ${analysisDuration}`)
+        this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mTotal duration:\x1b[0m ${totalDuration}`)
         this.verbose(1, `\x1b[1m\x1b[34m### ${serverName} CHEATING REPORT: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`)
         const cheaters = {
           Explosions: explosionCountersPerController,
-          ServerMoveTimeStampExpired: serverMoveTimestampExpiredPerPawn,
+          ServerMoveTimeStampExpired: serverMoveTimestampExpiredPerController,
+          ClientNetSpeed: playerControllerToNetspeed,
           Kills: killsPerPlayerController
         }
         let suspectedCheaters = [];
@@ -293,6 +422,9 @@ export default class DiscordCheaters extends DiscordBasePlugin {
             case 'ServerMoveTimeStampExpired':
               minCount = this.options.serverMoveTimeStampExpiredThreshold;
               break;
+            case 'ClientNetSpeed':
+              minCount = this.options.clientNetSpeedThreshold;
+              break;
             case 'Kills':
               minCount = this.options.killsThreshold;
               break;
@@ -303,8 +435,9 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           })
 
           this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31m${cK.toUpperCase()}\x1b[0m`)
-          for (let playerId in cheaters[cK])
-            if (cheaters[cK][playerId] > minCount && minCount != 0) {
+          for (let playerId in cheaters[cK]) {
+            const referenceValue = cheaters[cK][playerId]
+            if ((typeof referenceValue === "number" && referenceValue > minCount) || (typeof referenceValue === "object" && referenceValue.find(v => v > minCount))) {
               let playerName;
               let playerSteamID;
               let playerController;
@@ -323,6 +456,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
                 this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m  > \x1b[33m${playerSteamID}\x1b[90m ${playerController}\x1b[37m ${playerName}\x1b[90m: \x1b[91m${cheaters[cK][playerId]}\x1b[0m`);
               }
             }
+          }
         }
         if (suspectedCheaters.length === 0) {
           this.verbose(1, `\x1b[1m\x1b[34m### NO SUSPECTED CHEATERS FOUND: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`)
@@ -343,7 +477,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
 
             for (let playerController of playerControllerHistory) {
               let stringifiedConnectionTime = connectionTimesByPlayerController[playerController].toLocaleString();
-              let stringifiedDisconnectionTime = disconnectionTimesByPlayerController[playerController].toLocaleString()
+              let stringifiedDisconnectionTime = disconnectionTimesByPlayerController[playerController]?.toLocaleString() || "N/A"
 
               contentBuilding.push({
                 row: `#  >  ${playerController}: (${stringifiedConnectionTime} - ${stringifiedDisconnectionTime})`
