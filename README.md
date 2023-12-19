@@ -9,6 +9,8 @@
 - Set if you want to warn in game admins when a Detection was posted to your Discord.
 - Set the Threshold to `0` to Disable one of the Detections.
 - I recommend setting your Interval to at least 5 Minutes (300000 milliseconds) apart. There is a small spike on the CPU and Memory at each Interval.
+- `liveThreshold` is the Player Count you go Live at.
+- `seedMinThreshold` is the Minimum Player Count to be considering in "Seeding".
 
 ## What it do?
 - At a configurable interval, this plugin will read your `SquadGame.log` for Suspected Cheaters.
