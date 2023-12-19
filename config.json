@@ -10,5 +10,7 @@
     "explosionThreshold": 200,
     "serverMoveTimeStampExpiredThreshold": 1000,
     "clientNetSpeedThreshold": 1800,
-    "killsThreshold": 200
+    "killsThreshold": 200,
+    "liveThreshold": 50,
+    "seedingMinThreshold": 5
   }
