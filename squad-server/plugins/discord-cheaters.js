@@ -19,7 +19,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
       logDir: {
         required: true,
         description: 'Squad Log Directory.',
-        default: ''
+        example: 'c:/SquadGame/SquadLog.log'
       },
       pingGroups: {
         required: true,
@@ -36,42 +36,42 @@ export default class DiscordCheaters extends DiscordBasePlugin {
       warnInGameAdmins: {
         required: true,
         description: 'Should in-game admins be warned if a Suspected Cheater is detected.',
-        default: false
+        example: false
       },
       interval: {
         required: true,
         description: 'Frequency of the cheater checks in milliseconds.',
-        default: 5 * 60 * 1000
+        example: 5 * 60 * 1000
       },
       explosionThreshold: {
         required: true,
         description: 'Explosion Detection Threshold.',
-        default: 200
+        example: 200
       },
       serverMoveTimeStampExpiredThreshold: {
         required: true,
         description: 'ServerMoveTimeStampExpired Detection Threshold.',
-        default: 3000
+        example: 3000
       },
       clientNetSpeedThreshold: {
         required: true,
         description: 'Client Net Speed Threshold.',
-        default: 1800
+        example: 1800
       },
       killsThreshold: {
         required: true,
         description: 'Kills Detection Threshold.',
-        default: 200
+        example: 200
       },
       liveThreshold: {
         required: true,
         description: 'Server Live Player Threshold',
-        default: 50
+        example: 50
       },
       seedingMinThreshold: {
         required: true,
         description: 'Server Minimum Player Count for Seeding',
-        default: 5
+        example: 5
       }
     };
   }
@@ -119,10 +119,10 @@ export default class DiscordCheaters extends DiscordBasePlugin {
       let serverVersionMajor = 0;
 
       let uniqueClientNetSpeedValues = new Set();
-      data.setVar('ServerLiveTime', 0)
-      data.setVar('ServerSeedingTime', 0)
+      data.setVar('ServerLiveTime', 0);
+      data.setVar('ServerSeedingTime', 0);
 
-      data.setVar('CalculateLiveTime', calcSeedingLiveTime)
+      data.setVar('CalculateLiveTime', calcSeedingLiveTime);
 
       let explosionCountersPerController = [];
       let serverMoveTimestampExpiredPerController = [];
@@ -177,7 +177,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
         regex = /LogSquad: PostLogin: NewPlayer:/;
         res = regex.exec(line);
         if (res) {
-          data.getVar('CalculateLiveTime')(data)
+          data.getVar('CalculateLiveTime')(data);
           data.incrementCounter('players', 1);
           return;
         }
@@ -186,7 +186,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           /^\[([0-9.:-]+)]\[([ 0-9]*)]LogNet: UChannel::Close: Sending CloseBunch\. ChIndex == [0-9]+\. Name: \[UChannel\] ChIndex: [0-9]+, Closing: [0-9]+ \[UNetConnection\] RemoteAddr: (.+):[0-9]+, Name: (Steam|EOSIp)NetConnection_[0-9]+, Driver: GameNetDriver (Steam|EOS)NetDriver_[0-9]+, IsServer: YES, PC: ([^ ]+PlayerController_C_[0-9]+), Owner: [^ ]+PlayerController_C_[0-9]+/;
         res = regex.exec(line);
         if (res) {
-          data.getVar('CalculateLiveTime')(data)
+          data.getVar('CalculateLiveTime')(data);
           data.incrementCounter('players', -1);
           disconnectionTimesByPlayerController[res[6]] = getDateTime(res[1]);
           return;
@@ -297,7 +297,8 @@ export default class DiscordCheaters extends DiscordBasePlugin {
             pawnsToPlayerNames[res[2]] = res[1];
           }
 
-          regex = /\[(.+)\]\[([\s\d]+)\]LogSquad: PostLogin: NewPlayer: [^ ]+PlayerController_C.+PersistentLevel\.(.+)/;
+          regex =
+            /\[(.+)\]\[([\s\d]+)\]LogSquad: PostLogin: NewPlayer: [^ ]+PlayerController_C.+PersistentLevel\.(.+)/;
           res = regex.exec(line);
           if (res) {
             chainIdToPlayerController[+res[2]] = res[3];
@@ -377,7 +378,8 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           return;
         }
 
-        regex = /\[.+\]\[([\s\d]+)\]LogEOS: \[Category: LogEOSAntiCheat\] \[AntiCheatServer\] \[RegisterClient-001\].+AccountId: (\d+) IpAddress/;
+        regex =
+          /\[.+\]\[([\s\d]+)\]LogEOS: \[Category: LogEOSAntiCheat\] \[AntiCheatServer\] \[RegisterClient-001\].+AccountId: (\d+) IpAddress/;
         res = regex.exec(line);
         if (res) {
           const playerController = chainIdToPlayerController[+res[1]];
@@ -471,8 +473,8 @@ export default class DiscordCheaters extends DiscordBasePlugin {
 
         const endTime = Date.now();
         const analysisDuration = ((endAnalysisTIme - startTime) / 1000).toFixed(1);
-        const totalDuration = ((endTime - startTime) / 1000).toFixed(1)
-        data.setVar('TotalDuration', totalDuration)
+        const totalDuration = ((endTime - startTime) / 1000).toFixed(1);
+        data.setVar('TotalDuration', totalDuration);
 
         const liveTime = (data.getVar('ServerLiveTime') / 1000 / 60 / 60).toFixed(1);
         const seedingTime = (data.getVar('ServerSeedingTime') / 1000 / 60 / 60).toFixed(1);
@@ -497,11 +499,26 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           row: `### ${serverName} SUSPECTED CHEATER REPORT: ${fileNameNoExt} ###`
         });
 
-        this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Seeding Time:\x1b[0m ${seedingTime} h`)
-        this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Live Time:\x1b[0m ${liveTime} h`)
-        this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mAnalysis duration:\x1b[0m ${analysisDuration}`);
-        this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mTotal duration:\x1b[0m ${totalDuration}`);
-        this.verbose(1, `\x1b[1m\x1b[34m### ${serverName} CHEATING REPORT: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`);
+        this.verbose(
+          1,
+          `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Seeding Time:\x1b[0m ${seedingTime} h`
+        );
+        this.verbose(
+          1,
+          `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Live Time:\x1b[0m ${liveTime} h`
+        );
+        this.verbose(
+          1,
+          `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mAnalysis duration:\x1b[0m ${analysisDuration}`
+        );
+        this.verbose(
+          1,
+          `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mTotal duration:\x1b[0m ${totalDuration}`
+        );
+        this.verbose(
+          1,
+          `\x1b[1m\x1b[34m### ${serverName} CHEATING REPORT: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`
+        );
         const cheaters = {
           Explosions: explosionCountersPerController,
           ServerMoveTimeStampExpired: serverMoveTimestampExpiredPerController,
@@ -568,19 +585,28 @@ export default class DiscordCheaters extends DiscordBasePlugin {
                 suspectedCheaters.push(playerSteamID);
                 this.uniqueRowsSet.add(row);
                 contentBuilding.push({ row });
-                this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m  > \x1b[33m${playerSteamID}\x1b[90m ${playerController}\x1b[37m ${playerName}\x1b[90m: \x1b[91m${cheaters[cK][playerId]}\x1b[0m`);
+                this.verbose(
+                  1,
+                  `\x1b[1m\x1b[34m#\x1b[0m  > \x1b[33m${playerSteamID}\x1b[90m ${playerController}\x1b[37m ${playerName}\x1b[90m: \x1b[91m${cheaters[cK][playerId]}\x1b[0m`
+                );
               }
             }
           }
         }
         if (suspectedCheaters.length === 0) {
-          this.verbose(1, `\x1b[1m\x1b[34m### NO SUSPECTED CHEATERS FOUND: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`);
+          this.verbose(
+            1,
+            `\x1b[1m\x1b[34m### NO SUSPECTED CHEATERS FOUND: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`
+          );
           return;
         } else {
           contentBuilding.push({
             row: `### SUSPECTED CHEATERS SESSIONS: ${fileNameNoExt} ###`
           });
-          this.verbose(1, `\x1b[1m\x1b[34m### SUSPECTED CHEATERS SESSIONS: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`);
+          this.verbose(
+            1,
+            `\x1b[1m\x1b[34m### SUSPECTED CHEATERS SESSIONS: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`
+          );
           for (let playerSteamID of suspectedCheaters) {
             const playerControllerHistory = steamIDToPlayerController.get(playerSteamID);
             if (!playerControllerHistory) continue;
@@ -588,7 +614,10 @@ export default class DiscordCheaters extends DiscordBasePlugin {
             contentBuilding.push({
               row: `# == ${playerSteamID} | ${playerName}`
             });
-            this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[33m${playerSteamID} \x1b[31m${playerName}\x1b[0m`);
+            this.verbose(
+              1,
+              `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[33m${playerSteamID} \x1b[31m${playerName}\x1b[0m`
+            );
 
             for (let playerController of playerControllerHistory) {
               let stringifiedConnectionTime =
@@ -597,16 +626,25 @@ export default class DiscordCheaters extends DiscordBasePlugin {
                 disconnectionTimesByPlayerController[playerController]?.toLocaleString() || 'N/A';
 
               contentBuilding.push({
-                row: `#  >  ${playerController}: ${killsPerPlayerController[playerController] || 0
-                  } kills - (${stringifiedConnectionTime} - ${stringifiedDisconnectionTime})`
+                row: `#  >  ${playerController}: ${
+                  killsPerPlayerController[playerController] || 0
+                } kills - (${stringifiedConnectionTime} - ${stringifiedDisconnectionTime})`
               });
-              this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m  > \x1b[90m ${playerController}\x1b[90m: \x1b[91m${killsPerPlayerController[playerController] || 0} kills - (${stringifiedConnectionTime} - ${stringifiedDisconnectionTime})\x1b[0m`);
+              this.verbose(
+                1,
+                `\x1b[1m\x1b[34m#\x1b[0m  > \x1b[90m ${playerController}\x1b[90m: \x1b[91m${
+                  killsPerPlayerController[playerController] || 0
+                } kills - (${stringifiedConnectionTime} - ${stringifiedDisconnectionTime})\x1b[0m`
+              );
             }
           }
 
           const unidentifiedPawns = data.getVar('UnidentifiedPawns');
           if (unidentifiedPawns?.size > 0) {
-            this.verbose(1, `\x1b[1m\x1b[34m### UNIDENTIFIED PAWNS: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`);
+            this.verbose(
+              1,
+              `\x1b[1m\x1b[34m### UNIDENTIFIED PAWNS: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`
+            );
             contentBuilding.push({
               row: `#### UNIDENTIFIED PAWNS: ${fileNameNoExt} ###`
             });
@@ -620,7 +658,10 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           contentBuilding.push({
             row: `#### FINISHED ALL REPORTS: ${fileNameNoExt} ###`
           });
-          this.verbose(1, `\x1b[1m\x1b[34m#### FINISHED ALL REPORTS: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`);
+          this.verbose(
+            1,
+            `\x1b[1m\x1b[34m#### FINISHED ALL REPORTS: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`
+          );
 
           let pingables = 'Supsected Cheater Report for Review';
           if (this.options.pingGroups.length > 0) {
@@ -665,20 +706,24 @@ function getDateTime(date) {
   return new Date(res);
 }
 
-function calcSeedingLiveTime(data, liveThreshold = this.options.liveThreshold, seedingMinThreshold = this.options.seedingMinThreshold) {
-  const prevAmountPlayersData = data.getCounterLastValue('players')
+function calcSeedingLiveTime(
+  data,
+  liveThreshold = this.options.liveThreshold,
+  seedingMinThreshold = this.options.seedingMinThreshold
+) {
+  const prevAmountPlayersData = data.getCounterLastValue('players');
 
   if (!prevAmountPlayersData) return;
 
   if (prevAmountPlayersData.y >= liveThreshold) {
-    const prevLiveTime = data.getVar('ServerLiveTime')
+    const prevLiveTime = data.getVar('ServerLiveTime');
     const curTime = data.getLastTimePoint().time;
-    const timeDiff = +curTime - +prevAmountPlayersData.time
-    data.setVar('ServerLiveTime', prevLiveTime + timeDiff)
+    const timeDiff = +curTime - +prevAmountPlayersData.time;
+    data.setVar('ServerLiveTime', prevLiveTime + timeDiff);
   } else if (prevAmountPlayersData.y >= seedingMinThreshold) {
-    const prevLiveTime = data.getVar('ServerSeedingTime')
+    const prevLiveTime = data.getVar('ServerSeedingTime');
     const curTime = data.getLastTimePoint().time;
-    const timeDiff = +curTime - +prevAmountPlayersData.time
-    data.setVar('ServerSeedingTime', prevLiveTime + timeDiff)
+    const timeDiff = +curTime - +prevAmountPlayersData.time;
+    data.setVar('ServerSeedingTime', prevLiveTime + timeDiff);
   }
 }
