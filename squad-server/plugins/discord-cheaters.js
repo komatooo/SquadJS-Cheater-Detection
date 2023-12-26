@@ -626,14 +626,12 @@ export default class DiscordCheaters extends DiscordBasePlugin {
                 disconnectionTimesByPlayerController[playerController]?.toLocaleString() || 'N/A';
 
               contentBuilding.push({
-                row: `#  >  ${playerController}: ${
-                  killsPerPlayerController[playerController] || 0
-                } kills - (${stringifiedConnectionTime} - ${stringifiedDisconnectionTime})`
+                row: `#  >  ${playerController}: ${killsPerPlayerController[playerController] || 0
+                  } kills - (${stringifiedConnectionTime} - ${stringifiedDisconnectionTime})`
               });
               this.verbose(
                 1,
-                `\x1b[1m\x1b[34m#\x1b[0m  > \x1b[90m ${playerController}\x1b[90m: \x1b[91m${
-                  killsPerPlayerController[playerController] || 0
+                `\x1b[1m\x1b[34m#\x1b[0m  > \x1b[90m ${playerController}\x1b[90m: \x1b[91m${killsPerPlayerController[playerController] || 0
                 } kills - (${stringifiedConnectionTime} - ${stringifiedDisconnectionTime})\x1b[0m`
               );
             }
@@ -706,24 +704,24 @@ function getDateTime(date) {
   return new Date(res);
 }
 
-function calcSeedingLiveTime(
-  data,
-  liveThreshold = this.options.liveThreshold,
-  seedingMinThreshold = this.options.seedingMinThreshold
-) {
-  const prevAmountPlayersData = data.getCounterLastValue('players');
+function calcSeedingLiveTime(data, liveThreshold = 75, seedingMinThreshold = 2) {
+  const prevAmountPlayersData = data.getCounterLastValue('players')
 
   if (!prevAmountPlayersData) return;
 
   if (prevAmountPlayersData.y >= liveThreshold) {
-    const prevLiveTime = data.getVar('ServerLiveTime');
+    data.setVar('SeedingDone', true)
+    const prevLiveTime = data.getVar('ServerLiveTime')
     const curTime = data.getLastTimePoint().time;
-    const timeDiff = +curTime - +prevAmountPlayersData.time;
-    data.setVar('ServerLiveTime', prevLiveTime + timeDiff);
+    const timeDiff = +curTime - +prevAmountPlayersData.time
+    data.setVar('ServerLiveTime', prevLiveTime + timeDiff)
   } else if (prevAmountPlayersData.y >= seedingMinThreshold) {
-    const prevLiveTime = data.getVar('ServerSeedingTime');
+    if (data.getVar('SeedingDone')) return;
+    else data.setVar('SeedingDone', false);
+
+    const prevLiveTime = data.getVar('ServerSeedingTime')
     const curTime = data.getLastTimePoint().time;
-    const timeDiff = +curTime - +prevAmountPlayersData.time;
-    data.setVar('ServerSeedingTime', prevLiveTime + timeDiff);
+    const timeDiff = +curTime - +prevAmountPlayersData.time
+    data.setVar('ServerSeedingTime', prevLiveTime + timeDiff)
   }
 }
