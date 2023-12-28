@@ -360,7 +360,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
       analyzer.close();
     })
     rl.on('error', (err) => {
-      reject(err);
+      this.verbose(1, err);
     });
 
     await analyzer.analyze();
