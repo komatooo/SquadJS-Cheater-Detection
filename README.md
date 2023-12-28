@@ -1,4 +1,4 @@
-# Cheater report generator for SquadJS based on JetDave's Code
+# Cheater report generator for SquadJS based on [JetDave's Code](https://github.com/fantinodavide/Squad-Log-To-Graph)
 
 # THIS PLUGIN IS VERY MUCH IN A BETA STATE
 - It does what I intended it to do but has some very much needed Quality of Life updates.
