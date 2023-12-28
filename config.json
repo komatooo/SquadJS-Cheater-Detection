@@ -11,6 +11,7 @@
     "serverMoveTimeStampExpiredThreshold": 1000,
     "clientNetSpeedThreshold": 1800,
     "killsThreshold": 200,
+    "fobHitsThreshold": 50,
     "liveThreshold": 50,
     "seedingMinThreshold": 5
   }

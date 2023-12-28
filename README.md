@@ -7,6 +7,7 @@
 - Add the bits to your SquadJS
 - If you want to setup Role Pinging use `"pingGroups":  ["723400310667870230", "550182386219089921"],` with your RoleID(s) in place of the example IDs.
 - Set if you want to warn in game admins when a Detection was posted to your Discord.
+- The Config has the current recommended Thresholds. You are welcome to tweak them as needed.
 - Set the Threshold to `0` to Disable one of the Detections.
 - I recommend setting your Interval to at least 5 Minutes (300000 milliseconds) apart. There is a small spike on the CPU and Memory at each Interval.
 - `liveThreshold` is the Player Count you go Live at.
@@ -14,14 +15,15 @@
 
 ## What it do?
 - At a configurable interval, this plugin will read your `SquadGame.log` for Suspected Cheaters.
-- It checks configurable values such as `Explosions`, `ServerMoveTimeStampExpired`, and `Kills`.
+- It checks configurable values such as `Explosions`, `ServerMoveTimeStampExpired`, `ClientNetSpeed`, `Kills`, and `FOBHits`.
 - If any Suspected Cheaters are found, it pushes it to a configurable Discord Channel.
 
 ## Detection Methods and the Possible False Positives
 - `Explosions`: it's possible for someone to be a false positive on explosions particularly if they're driving around an armor piece such as a BTR spamming HE.
 - `ServerMoveTimeStampExpired`: it's possible for someone to be a false positive on this if they lag a lot or have high ping.
 - `ClientNetSpeed`: Unknown if tied to Cheaters yet. Set Threshold to `0` to Disable.
-- `Kills`: this one is obviously possible to easily put out a false positive for the better players.
+- `Kills`: this one it's obviously possible for false positives on good players.
+- `FOBHits`: damage to a FOB Radio. Restricted to only what is logged currently in the logs.
 
 ## What in the world is `ServerMoveTimeStampExpired`???
 - The best explanation I can find is from `{ASG} Skillet` in OWI Hosting Discord.
@@ -32,8 +34,14 @@
 > Unreal engine parameter that sets the max bandwidth to the client. Too low and you get a lot of desync; too high and it murders TPS. The server setting is supposed to be authoritative but there seems to be some inconsistency. Unclear if it's exploiting, people just setting ini parameters, or just the game making more spaghetti
 I don't think there is anything firm tying it to cheating. I think the thought process was it might be worth tracking, but probably not something that needs to be flagged for admins in the moment.
 
-## Example Output
-![Example](https://raw.githubusercontent.com/IgnisAlienus/SquadJS-Cheater-Detection/master/example-output.png)
+## Example Discord Output
+![Example](https://raw.githubusercontent.com/IgnisAlienus/SquadJS-Cheater-Detection/master/example-discord-output.png)
+
+## Example Console Output
+![Example](https://raw.githubusercontent.com/IgnisAlienus/SquadJS-Cheater-Detection/master/example-console-output.png)
+
+## Example AdminWarn
+![Example](https://raw.githubusercontent.com/IgnisAlienus/SquadJS-Cheater-Detection/master/example-adminwarn.png)
 
 ## Known Issues
 - It's possible that if you set your Detection Thresholds too low that the output text will be longer than 4,000 Characters which will cause an API error with Discord since that will make the message too large to send.

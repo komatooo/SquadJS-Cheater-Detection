@@ -1,26 +1,33 @@
-const RESET_FREQUENCY_SECONDS = 120;
+const RESET_FREQUENCY_SECONDS_DEFAULT = 120;
 export default class DataStore {
-    constructor() {
+    #resetFrequencySeconds
+
+    constructor(resetFrequencySeconds = RESET_FREQUENCY_SECONDS_DEFAULT) {
+        this.#resetFrequencySeconds = resetFrequencySeconds
         this.timePoints = [];
         this.counters = new Map();
         this.vars = new Map();
     }
 
+    get resetFrequencySeconds() {
+        return this.#resetFrequencySeconds
+    }
+
     incrementCounter(key, incrementer, time = null) {
         const counter = this.counters.get(key);
-        const value = +(counter?.length > 0 ? counter[ counter.length - 1 ].y : 0) + incrementer;
+        const value = +(counter?.length > 0 ? counter[counter.length - 1].y : 0) + incrementer;
         return this.setNewCounterValue(key, value, null, time)
     }
 
     incrementCounterLast(key, incrementer) {
         const counter = this.counters.get(key);
-        counter[ counter.length - 1 ].y += incrementer;
+        counter[counter.length - 1].y += incrementer;
     }
 
     incrementFrequencyCounter(key, incrementer) {
         const timeNow = this.getLastTimePoint();
         const counter = this.counters.get(key);
-        if (!counter || +timeNow.time - +counter[ counter.length - 1 ].time > RESET_FREQUENCY_SECONDS * 1000)
+        if (!counter || +timeNow.time - +counter[counter.length - 1].time > this.#resetFrequencySeconds * 1000)
             this.resetFrequencyCounter(key)
 
         this.incrementCounterLast(key, incrementer)
@@ -32,7 +39,7 @@ export default class DataStore {
         const preTimeNow = this.getPreLastTimePoint();
         const counter = this.counters.get(key);
         if (counter?.length > 0)
-            this.setNewCounterValue(key, 0, undefined, counter[ counter.length - 1 ].time, true)
+            this.setNewCounterValue(key, 0, undefined, counter[counter.length - 1].time, true)
         // this.setNewCounterValue(key, 0, null, preTimeNow.time, true)
         this.setNewCounterValue(key, 0)
     }
@@ -52,7 +59,7 @@ export default class DataStore {
         }
         if (oldCounter && !skipDuplication) {
             const oldObjDuplication = {
-                y: oldCounter[ oldCounter.length - 1 ].y,
+                y: oldCounter[oldCounter.length - 1].y,
                 x: time.formatted,
                 time: time.time,
                 label: label
@@ -74,10 +81,10 @@ export default class DataStore {
     }
 
     getLastTimePoint() {
-        return this.timePoints[ this.timePoints.length - 1 ];
+        return this.timePoints[this.timePoints.length - 1];
     }
     getPreLastTimePoint() {
-        return this.timePoints[ this.timePoints.length - 2 ];
+        return this.timePoints[this.timePoints.length - 2];
     }
 
     getTimePoints() {
@@ -90,20 +97,20 @@ export default class DataStore {
 
     getCounterLastValue(key) {
         const data = this.getCounterData(key)
-        return data[ data.length - 1 ]
+        return data[data.length - 1]
     }
 
     getCounters() {
-        return [ ...this.timeData.keys() ];
+        return [...this.timeData.keys()];
     }
 
-    
+
     setVar(key, value) {
         this.vars.set(key, value);
     }
 
     getVarKeys() {
-        return [ ...this.vars.keys() ];
+        return [...this.vars.keys()];
     }
 
     getVar(key) {
