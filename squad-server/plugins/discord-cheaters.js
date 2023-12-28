@@ -263,7 +263,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           }
         }
       }
-      if (suspectedCheaters.length === 0) {
+      if (suspectedCheaters.size === 0) {
         this.verbose(1, `\x1b[1m\x1b[34m### NO SUSPECTED CHEATERS FOUND: \x1b[32m${data.getVar('ServerName')}\x1b[34m ###\x1b[0m`);
         return;
       } else {
