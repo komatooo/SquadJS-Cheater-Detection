@@ -2,14 +2,14 @@
 <div align="center">
 
 [![GitHub Release](https://img.shields.io/github/release/IgnisAlienus/SquadJS-Cheater-Detection.svg?style=flat-square)](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection/releases)
-[![GitHub Contributors](https://img.shields.io/github/contributors/Team-Silver-Sphere/SquadJS.svg?style=flat-square)](https://github.com/Team-Silver-Sphere/SquadJS/graphs/contributors)
-[![GitHub Release](https://img.shields.io/github/license/Team-Silver-Sphere/SquadJS.svg?style=flat-square)](https://github.com/Team-Silver-Sphere/SquadJS/blob/master/LICENSE)
+[![GitHub Contributors](https://img.shields.io/github/contributors/IgnisAlienus/SquadJS-Cheater-Detection.svg?style=flat-square)](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection/graphs/contributors)
+[![GitHub Release](https://img.shields.io/github/license/IgnisAlienus/SquadJS-Cheater-Detection.svg?style=flat-square)](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection/blob/master/LICENSE)
 
 <br>
 
-[![GitHub Issues](https://img.shields.io/github/issues/Team-Silver-Sphere/SquadJS.svg?style=flat-square)](https://github.com/Team-Silver-Sphere/SquadJS/issues)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr-raw/Team-Silver-Sphere/SquadJS.svg?style=flat-square)](https://github.com/Team-Silver-Sphere/SquadJS/pulls)
-[![GitHub Stars](https://img.shields.io/github/stars/Team-Silver-Sphere/SquadJS.svg?style=flat-square)](https://github.com/Team-Silver-Sphere/SquadJS/stargazers)
+[![GitHub Issues](https://img.shields.io/github/issues/IgnisAlienus/SquadJS-Cheater-Detection.svg?style=flat-square)](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr-raw/IgnisAlienus/SquadJS-Cheater-Detection.svg?style=flat-square)](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection/pulls)
+[![GitHub Stars](https://img.shields.io/github/stars/IgnisAlienus/SquadJS-Cheater-Detection.svg?style=flat-square)](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection/stargazers)
 [![Discord](https://img.shields.io/discord/266210223406972928.svg?style=flat-square&logo=discord)](https://discord.gg/onlybans)
 
 <br><br>
