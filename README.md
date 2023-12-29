@@ -1,7 +1,7 @@
 # Cheater report generator for SquadJS based on [JetDave's Code](https://github.com/fantinodavide/Squad-Log-To-Graph)
 <div align="center">
 
-[![GitHub Release](https://img.shields.io/github/release/Team-Silver-Sphere/SquadJS.svg?style=flat-square)](https://github.com/Team-Silver-Sphere/SquadJS/releases)
+[![GitHub Release](https://img.shields.io/github/release/IgnisAlienus/SquadJS-Cheater-Detection.svg?style=flat-square)](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection/releases)
 [![GitHub Contributors](https://img.shields.io/github/contributors/Team-Silver-Sphere/SquadJS.svg?style=flat-square)](https://github.com/Team-Silver-Sphere/SquadJS/graphs/contributors)
 [![GitHub Release](https://img.shields.io/github/license/Team-Silver-Sphere/SquadJS.svg?style=flat-square)](https://github.com/Team-Silver-Sphere/SquadJS/blob/master/LICENSE)
 
