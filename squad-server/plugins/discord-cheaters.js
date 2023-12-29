@@ -117,7 +117,9 @@ export default class DiscordCheaters extends DiscordBasePlugin {
 
       if (currentVersion !== latestVersion) {
         this.verbose(1, 'A new version is available. Please update your plugin.');
-        // Perform actions to notify the user or prompt them to update
+        this.sendDiscordMessage({
+          content: `A new version of \`SquadJS-Cheater-Detection\` is available. Please update your plugin. Current version: \`${currentVersion}\` [Latest version](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection): \`${latestVersion}\``
+        });
       } else {
         this.verbose(1, 'You are running the latest version.');
       }
