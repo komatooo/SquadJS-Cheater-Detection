@@ -1,5 +1,6 @@
 //Plugin by PSG - Ignis - Press Start Gaming using JetDave's Original Tool Code at https://github.com/fantinodavide/Squad-Log-To-Graph
 import DiscordBasePlugin from './discord-base-plugin.js';
+import fetch from 'node-fetch';
 import fs from 'fs';
 import path from 'path';
 import readline from 'readline';
@@ -97,12 +98,33 @@ export default class DiscordCheaters extends DiscordBasePlugin {
   }
 
   async mount() {
+    this.checkVersion();
     this.cheaterCheck = setInterval(this.cheaterCheck, this.options.interval);
   }
 
   async unmount() {
     clearInterval(this.interval);
   }
+
+  // Function to check if the current version is the latest version
+async checkVersion() {
+  const owner = 'IgnisAlienus';
+  const repo = 'SquadJS-Cheater-Detection';
+  const currentVersion = 'v1.0.0'; // Replace with the version of your code being run
+
+  try {
+    const latestVersion = await getLatestVersion(owner, repo);
+
+    if (currentVersion !== latestVersion) {
+      this.verbose(1, 'A new version is available. Please update your plugin.');
+      // Perform actions to notify the user or prompt them to update
+    } else {
+      this.verbose(1, 'You are running the latest version.');
+    }
+  } catch (error) {
+    this.verbose(1, 'Error retrieving the latest version:', error);
+  }
+}
 
   async cheaterCheck() {
     const logDirectory = this.options.logDir;
@@ -383,4 +405,12 @@ export default class DiscordCheaters extends DiscordBasePlugin {
       }
     }
   }
+}
+
+// Function to retrieve the latest version from GitHub
+async function getLatestVersion(owner, repo) {
+  const url = `https://api.github.com/repos/${owner}/${repo}/releases/latest`;
+  const response = await fetch(url);
+  const data = await response.json();
+  return data.tag_name;
 }
