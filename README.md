@@ -1,4 +1,19 @@
 # Cheater report generator for SquadJS based on [JetDave's Code](https://github.com/fantinodavide/Squad-Log-To-Graph)
+<div align="center">
+
+[![GitHub Release](https://img.shields.io/github/release/Team-Silver-Sphere/SquadJS.svg?style=flat-square)](https://github.com/Team-Silver-Sphere/SquadJS/releases)
+[![GitHub Contributors](https://img.shields.io/github/contributors/Team-Silver-Sphere/SquadJS.svg?style=flat-square)](https://github.com/Team-Silver-Sphere/SquadJS/graphs/contributors)
+[![GitHub Release](https://img.shields.io/github/license/Team-Silver-Sphere/SquadJS.svg?style=flat-square)](https://github.com/Team-Silver-Sphere/SquadJS/blob/master/LICENSE)
+
+<br>
+
+[![GitHub Issues](https://img.shields.io/github/issues/Team-Silver-Sphere/SquadJS.svg?style=flat-square)](https://github.com/Team-Silver-Sphere/SquadJS/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr-raw/Team-Silver-Sphere/SquadJS.svg?style=flat-square)](https://github.com/Team-Silver-Sphere/SquadJS/pulls)
+[![GitHub Stars](https://img.shields.io/github/stars/Team-Silver-Sphere/SquadJS.svg?style=flat-square)](https://github.com/Team-Silver-Sphere/SquadJS/stargazers)
+[![Discord](https://img.shields.io/discord/266210223406972928.svg?style=flat-square&logo=discord)](https://discord.gg/onlybans)
+
+<br><br>
+</div>
 
 # THIS PLUGIN IS VERY MUCH IN A BETA STATE
 - It does what I intended it to do but has some very much needed Quality of Life updates.
