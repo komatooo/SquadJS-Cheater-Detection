@@ -106,25 +106,25 @@ export default class DiscordCheaters extends DiscordBasePlugin {
     clearInterval(this.interval);
   }
 
-  // Function to check if the current version is the latest version
-async checkVersion() {
-  const owner = 'IgnisAlienus';
-  const repo = 'SquadJS-Cheater-Detection';
-  const currentVersion = 'v1.0.0'; // Replace with the version of your code being run
+  // Check if current version is the latest version
+  async checkVersion() {
+    const owner = 'IgnisAlienus';
+    const repo = 'SquadJS-Cheater-Detection';
+    const currentVersion = 'v1.0.0';
 
-  try {
-    const latestVersion = await getLatestVersion(owner, repo);
+    try {
+      const latestVersion = await getLatestVersion(owner, repo);
 
-    if (currentVersion !== latestVersion) {
-      this.verbose(1, 'A new version is available. Please update your plugin.');
-      // Perform actions to notify the user or prompt them to update
-    } else {
-      this.verbose(1, 'You are running the latest version.');
+      if (currentVersion !== latestVersion) {
+        this.verbose(1, 'A new version is available. Please update your plugin.');
+        // Perform actions to notify the user or prompt them to update
+      } else {
+        this.verbose(1, 'You are running the latest version.');
+      }
+    } catch (error) {
+      this.verbose(1, 'Error retrieving the latest version:', error);
     }
-  } catch (error) {
-    this.verbose(1, 'Error retrieving the latest version:', error);
   }
-}
 
   async cheaterCheck() {
     const logDirectory = this.options.logDir;
@@ -177,38 +177,38 @@ async checkVersion() {
       const seedingTime = (data.getVar('ServerSeedingTime') / 1000 / 60 / 60).toFixed(1);
 
       let contentBuilding = [];
-      contentBuilding.push({row: `### ${data.getVar('ServerName')} SERVER STAT REPORT: ${fileNameNoExt} ###`});
+      contentBuilding.push({ row: `### ${data.getVar('ServerName')} SERVER STAT REPORT: ${fileNameNoExt} ###` });
       contentBuilding.push({ row: `# == Server CPU: ${data.getVar('ServerCPU')}` });
       contentBuilding.push({ row: `# == Server OS: ${data.getVar('ServerOS')}` });
       contentBuilding.push({ row: `# == Squad Version: ${data.getVar('ServerVersion')}` });
       contentBuilding.push({ row: `# == Server Uptime: ${serverUptimeHours} h` });
       contentBuilding.push({ row: `# == Server Seeding Time: ${seedingTime}` });
       contentBuilding.push({ row: `# == Server Live Time: ${liveTime}` });
-      contentBuilding.push({row: `# == Host Closed Connections: ${data.getCounterData('hostClosedConnection').map((e) => e.y / 3).reduce((acc, curr) => acc + curr, 0)}`});
-      contentBuilding.push({row: `# == Failed Queue Connections: ${data.getCounterData('queueDisconnections').map((e) => e.y / 3).reduce((acc, curr) => acc + curr, 0)}`});
-      contentBuilding.push({row: `# == Steam Empty Tickets: ${data.getCounterData('steamEmptyTicket').map((e) => e.y).reduce((acc, curr) => acc + curr, 0)}`});
-      contentBuilding.push({row: `# == Unique Client NetSpeed Values: ${[...data.getVar('UniqueClientNetSpeedValues').values()].join('; ')}`});
-      contentBuilding.push({row: `# == Accepted Connection Lines: ${data.getCounterData('AcceptedConnection').map((e) => Math.round(e.y * 1000)).reduce((acc, curr) => acc + curr, 0)}`});
+      contentBuilding.push({ row: `# == Host Closed Connections: ${data.getCounterData('hostClosedConnection').map((e) => e.y / 3).reduce((acc, curr) => acc + curr, 0)}` });
+      contentBuilding.push({ row: `# == Failed Queue Connections: ${data.getCounterData('queueDisconnections').map((e) => e.y / 3).reduce((acc, curr) => acc + curr, 0)}` });
+      contentBuilding.push({ row: `# == Steam Empty Tickets: ${data.getCounterData('steamEmptyTicket').map((e) => e.y).reduce((acc, curr) => acc + curr, 0)}` });
+      contentBuilding.push({ row: `# == Unique Client NetSpeed Values: ${[...data.getVar('UniqueClientNetSpeedValues').values()].join('; ')}` });
+      contentBuilding.push({ row: `# == Accepted Connection Lines: ${data.getCounterData('AcceptedConnection').map((e) => Math.round(e.y * 1000)).reduce((acc, curr) => acc + curr, 0)}` });
       contentBuilding.push({ row: `# == Analysis duration: ${analysisDuration}` });
       contentBuilding.push({ row: `# == Total duration: ${totalDuration}` });
-      contentBuilding.push({row: `### ${data.getVar('ServerName')} SUSPECTED CHEATER REPORT: ${fileNameNoExt} ###`});
+      contentBuilding.push({ row: `### ${data.getVar('ServerName')} SUSPECTED CHEATER REPORT: ${fileNameNoExt} ###` });
 
-      this.verbose(1,`\n\x1b[1m\x1b[34m### ${data.getVar('ServerName')} SERVER STAT REPORT: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`);
-      this.verbose(1,`\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Name:\x1b[0m ${data.getVar('ServerName')}`);
-      this.verbose(1,`\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer CPU:\x1b[0m ${data.getVar('ServerCPU')}`);
-      this.verbose(1,`\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer OS:\x1b[0m ${data.getVar('ServerOS')}`);
-      this.verbose(1,`\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mSquad Version:\x1b[0m ${data.getVar('ServerVersion')}`);
-      this.verbose(1,`\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Uptime:\x1b[0m ${serverUptimeHours} h`);
-      this.verbose(1,`\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Live Time:\x1b[0m ${liveTime} h`);
-      this.verbose(1,`\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Seeding Time:\x1b[0m ${seedingTime} h`);
-      this.verbose(1,`\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mHost Closed Connections:\x1b[0m ${data.getCounterData('hostClosedConnection').map((e) => e.y / 3).reduce((acc, curr) => acc + curr, 0)}`);
-      this.verbose(1,`\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mFailed Queue Connections:\x1b[0m ${data.getCounterData('queueDisconnections').map((e) => e.y / 3).reduce((acc, curr) => acc + curr, 0)}`);
-      this.verbose(1,`\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mSteam Empty Tickets:\x1b[0m ${data.getCounterData('steamEmptyTicket').map((e) => e.y).reduce((acc, curr) => acc + curr, 0)}`);
-      this.verbose(1,`\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mUnique Client NetSpeed Values:\x1b[0m ${[...data.getVar('UniqueClientNetSpeedValues').values()].join('; ')}`);
-      this.verbose(1,`\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mAccepted Connection Lines:\x1b[0m ${data.getCounterData('AcceptedConnection').map((e) => Math.round(e.y * 1000)).reduce((acc, curr) => acc + curr, 0)}`);
-      this.verbose(1,`\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mAnalysis duration:\x1b[0m ${analysisDuration}`);
-      this.verbose(1,`\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mTotal duration:\x1b[0m ${totalDuration}`);
-      this.verbose(1,`\x1b[1m\x1b[34m### CHEATING REPORT: \x1b[32m${data.getVar('ServerName')}\x1b[34m ###\x1b[0m`);
+      this.verbose(1, `\n\x1b[1m\x1b[34m### ${data.getVar('ServerName')} SERVER STAT REPORT: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`);
+      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Name:\x1b[0m ${data.getVar('ServerName')}`);
+      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer CPU:\x1b[0m ${data.getVar('ServerCPU')}`);
+      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer OS:\x1b[0m ${data.getVar('ServerOS')}`);
+      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mSquad Version:\x1b[0m ${data.getVar('ServerVersion')}`);
+      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Uptime:\x1b[0m ${serverUptimeHours} h`);
+      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Live Time:\x1b[0m ${liveTime} h`);
+      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Seeding Time:\x1b[0m ${seedingTime} h`);
+      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mHost Closed Connections:\x1b[0m ${data.getCounterData('hostClosedConnection').map((e) => e.y / 3).reduce((acc, curr) => acc + curr, 0)}`);
+      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mFailed Queue Connections:\x1b[0m ${data.getCounterData('queueDisconnections').map((e) => e.y / 3).reduce((acc, curr) => acc + curr, 0)}`);
+      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mSteam Empty Tickets:\x1b[0m ${data.getCounterData('steamEmptyTicket').map((e) => e.y).reduce((acc, curr) => acc + curr, 0)}`);
+      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mUnique Client NetSpeed Values:\x1b[0m ${[...data.getVar('UniqueClientNetSpeedValues').values()].join('; ')}`);
+      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mAccepted Connection Lines:\x1b[0m ${data.getCounterData('AcceptedConnection').map((e) => Math.round(e.y * 1000)).reduce((acc, curr) => acc + curr, 0)}`);
+      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mAnalysis duration:\x1b[0m ${analysisDuration}`);
+      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mTotal duration:\x1b[0m ${totalDuration}`);
+      this.verbose(1, `\x1b[1m\x1b[34m### CHEATING REPORT: \x1b[32m${data.getVar('ServerName')}\x1b[34m ###\x1b[0m`);
       const cheaters = {
         Explosions: data.getVar('explosionCountersPerController'),
         ServerMoveTimeStampExpired: data.getVar('serverMoveTimestampExpiredPerController'),
@@ -407,7 +407,7 @@ async checkVersion() {
   }
 }
 
-// Function to retrieve the latest version from GitHub
+// Retrieve the latest version from GitHub
 async function getLatestVersion(owner, repo) {
   const url = `https://api.github.com/repos/${owner}/${repo}/releases/latest`;
   const response = await fetch(url);
