@@ -272,6 +272,7 @@ export default class Analyzer extends EventEmitter {
                         let playerController = res[ 1 ]
                         if (!playerController || playerController == 'nullptr') {
                             const playerNameToPlayerController = data.getVar('playerNameToPlayerController')
+                            const pawnsToPlayerNames = data.getVar('pawnsToPlayerNames')
                             playerController = playerNameToPlayerController[ pawnsToPlayerNames[ res[ 2 ] ] ]
                         }
 
