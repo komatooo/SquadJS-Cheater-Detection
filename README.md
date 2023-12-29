@@ -10,7 +10,7 @@
 [![GitHub Issues](https://img.shields.io/github/issues/IgnisAlienus/SquadJS-Cheater-Detection.svg?style=flat-square)](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection/issues)
 [![GitHub Pull Requests](https://img.shields.io/github/issues-pr-raw/IgnisAlienus/SquadJS-Cheater-Detection.svg?style=flat-square)](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection/pulls)
 [![GitHub Stars](https://img.shields.io/github/stars/IgnisAlienus/SquadJS-Cheater-Detection.svg?style=flat-square)](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection/stargazers)
-[![Discord](https://img.shields.io/discord/266210223406972928.svg?style=flat-square&logo=discord)](https://discord.gg/onlybans)
+[![Discord](https://img.shields.io/discord/1174357658971668551.svg?style=flat-square&logo=discord)](https://discord.gg/onlybans)
 
 <br><br>
 </div>
