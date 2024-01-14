@@ -7,12 +7,6 @@ import readline from 'readline';
 
 import DataStore from '../utils/data-store.js';
 import Analyzer from '../utils/analyzer.js';
-
-const options = {
-  ENABLE_TSEXPIRED_DELTA_CHECK: true,
-  PLAYER_CONTROLLER_FILTER: '' // To move to a better place. Set to a real player controller value like BP_PlayerController_C_2146648925 to filter the graph (partially implemented)
-};
-
 export default class DiscordCheaters extends DiscordBasePlugin {
   static get description() {
     return 'The <code>DiscordCheater</code> plugin will log suspected Cheaters to a Discord channel.';
@@ -110,7 +104,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
   async checkVersion() {
     const owner = 'IgnisAlienus';
     const repo = 'SquadJS-Cheater-Detection';
-    const currentVersion = 'v1.0.2';
+    const currentVersion = 'v1.1.0';
 
     try {
       const latestVersion = await getLatestVersion(owner, repo);
@@ -154,25 +148,31 @@ export default class DiscordCheaters extends DiscordBasePlugin {
       crlfDelay: Infinity
     });
 
+    const options = {
+      ENABLE_TSEXPIRED_DELTA_CHECK: true,
+      PLAYER_CONTROLLER_FILTER: '', // To move to a better place. Set to a real player controller value like BP_PlayerController_C_2146648925 to filter the graph (partially implemented)
+      LIVE_THRESHOLD: this.options.liveThreshold,
+      SEEDING_MIN_THRESHOLD: this.options.seedingMinThreshold
+    };
+
     const data = new DataStore();
     const analyzer = new Analyzer(data, options);
 
     analyzer.on('close', (data) => {
-      if (!data.getVar('ServerName')) data.setVar('ServerName', fileNameNoExt);
+      if (!data.getVar('ServerName'))
+        data.setVar('ServerName', fileNameNoExt);
 
-      data.setVar('AnalysisEndTime', Date.now());
-      const serverUptimeMs =
-        +data.timePoints[data.timePoints.length - 1].time - +data.timePoints[0].time;
+      const serverUptimeMs = (+data.timePoints[data.timePoints.length - 1].time - +data.timePoints[0].time);
       const serverUptimeHours = (serverUptimeMs / 1000 / 60 / 60).toFixed(1);
 
       const startTime = data.getVar('AnalysisStartTime');
-      const endAnalysisTime = data.getVar('AnalysisEndTime');
-      const endTime = Date.now();
-      data.setVar('TotalEndTime', endTime);
-      const analysisDuration = ((endAnalysisTime - startTime) / 1000).toFixed(1);
-      data.setVar('AnalysisDuration', analysisDuration);
+      const totalEndTime = Date.now();
+      data.setVar('TotalEndTime', totalEndTime)
+      const analysisDuration = data.getVar('AnalysisDuration')
 
-      const totalDuration = ((endTime - startTime) / 1000).toFixed(1);
+      const totalDurationMs = totalEndTime - startTime
+      const totalDuration = (totalDurationMs / 1000).toFixed(1)
+      data.setVar('TotalDurationMs', totalDurationMs)
       data.setVar('TotalDuration', totalDuration);
 
       const liveTime = (data.getVar('ServerLiveTime') / 1000 / 60 / 60).toFixed(1);
@@ -191,8 +191,8 @@ export default class DiscordCheaters extends DiscordBasePlugin {
       contentBuilding.push({ row: `# == Steam Empty Tickets: ${data.getCounterData('steamEmptyTicket').map((e) => e.y).reduce((acc, curr) => acc + curr, 0)}` });
       contentBuilding.push({ row: `# == Unique Client NetSpeed Values: ${[...data.getVar('UniqueClientNetSpeedValues').values()].join('; ')}` });
       contentBuilding.push({ row: `# == Accepted Connection Lines: ${data.getCounterData('AcceptedConnection').map((e) => Math.round(e.y * 1000)).reduce((acc, curr) => acc + curr, 0)}` });
-      contentBuilding.push({ row: `# == Analysis duration: ${analysisDuration}` });
-      contentBuilding.push({ row: `# == Total duration: ${totalDuration}` });
+      contentBuilding.push({ row: `# == Analysis duration: ${analysisDuration}s` });
+      contentBuilding.push({ row: `# == Total duration: ${totalDuration}s` });
       contentBuilding.push({ row: `### ${data.getVar('ServerName')} SUSPECTED CHEATER REPORT: ${fileNameNoExt} ###` });
 
       this.verbose(1, `\n\x1b[1m\x1b[34m### ${data.getVar('ServerName')} SERVER STAT REPORT: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`);
@@ -208,8 +208,8 @@ export default class DiscordCheaters extends DiscordBasePlugin {
       this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mSteam Empty Tickets:\x1b[0m ${data.getCounterData('steamEmptyTicket').map((e) => e.y).reduce((acc, curr) => acc + curr, 0)}`);
       this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mUnique Client NetSpeed Values:\x1b[0m ${[...data.getVar('UniqueClientNetSpeedValues').values()].join('; ')}`);
       this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mAccepted Connection Lines:\x1b[0m ${data.getCounterData('AcceptedConnection').map((e) => Math.round(e.y * 1000)).reduce((acc, curr) => acc + curr, 0)}`);
-      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mAnalysis duration:\x1b[0m ${analysisDuration}`);
-      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mTotal duration:\x1b[0m ${totalDuration}`);
+      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mAnalysis duration:\x1b[0m ${analysisDuration}s`);
+      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mTotal duration:\x1b[0m ${totalDuration}s`);
       this.verbose(1, `\x1b[1m\x1b[34m### CHEATING REPORT: \x1b[32m${data.getVar('ServerName')}\x1b[34m ###\x1b[0m`);
       const cheaters = {
         Explosions: data.getVar('explosionCountersPerController'),
@@ -349,7 +349,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
         let currentMessage = '';
 
         this.sendDiscordMessage({
-          content: `${pingables}`
+          content: `${pingables}\nJust because a "SUSPECTED CHEATER" is list in the Output does NOT *always* guarantee they are a Cheater. Verify with recorded in-game footage if possible. Get with https://discord.gg/onlybans to go over the results in more detail if you are not sure.\n\nFor more information on what each line means in the output, please visit: https://www.guardianonlybans.com/logcheck-info`
         });
 
         for (const item of contentBuilding) {
