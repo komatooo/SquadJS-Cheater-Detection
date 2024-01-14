@@ -61,31 +61,31 @@ export default class Analyzer extends EventEmitter {
                 regex = /\[(.+)\]\[[\s\d]+\]LogSquad: .+: Server Tick Rate: (\d+.?\d+)/;
                 res = regex.exec(line);
                 if (res) {
-                    const timePoint = this.getDateTime(res[ 1 ]);
+                    const timePoint = this.getDateTime(res[1]);
                     data.addTimePoint(timePoint);
 
-                    data.setNewCounterValue('tickRate', Math.round(+res[ 2 ]))
+                    data.setNewCounterValue('tickRate', Math.round(+res[2]))
                     return;
                 }
 
                 regex = / ServerName: \'(.+)\' RegisterTimeout:/
                 res = regex.exec(line);
                 if (res) {
-                    data.setVar('ServerName', res[ 1 ]);
+                    data.setVar('ServerName', res[1]);
                     return;
                 }
 
                 regex = /LogInit: OS: .+, CPU: (.+), GPU:/
                 res = regex.exec(line);
                 if (res) {
-                    data.setVar('ServerCPU', res[ 1 ]);
+                    data.setVar('ServerCPU', res[1]);
                     return;
                 }
 
                 regex = /LogNetVersion: Set ProjectVersion to (V.+)\. Version/
                 res = regex.exec(line);
                 if (res) {
-                    let serverVersion = res[ 1 ];
+                    let serverVersion = res[1];
                     data.setVar('ServerVersion', serverVersion)
                     data.setVar('ServerVersionMajor', +serverVersion.substring(1, 2))
                     return;
@@ -130,7 +130,7 @@ export default class Analyzer extends EventEmitter {
                     data.getVar('CalculateLiveTime')(data)
                     data.incrementCounter('players', -1);
                     const disconnectionTimesByPlayerController = data.getVar('disconnectionTimesByPlayerController')
-                    disconnectionTimesByPlayerController[ res[ 6 ] ] = this.getDateTime(res[ 1 ])
+                    disconnectionTimesByPlayerController[res[6]] = this.getDateTime(res[1])
                     return;
                 }
 
@@ -144,46 +144,46 @@ export default class Analyzer extends EventEmitter {
                 regex = /\[(.+)\].+LogSquad: OnPreLoadMap: Loading map .+\/([^\/]+)$/;
                 res = regex.exec(line);
                 if (res) {
-                    const timePoint = this.getDateTime(res[ 1 ]);
-                    data.setNewCounterValue('layers', 150, res[ 2 ], timePoint)
+                    const timePoint = this.getDateTime(res[1]);
+                    data.setNewCounterValue('layers', 150, res[2], timePoint)
                     return;
                 }
 
                 regex = /\[(.+)\]\[[\s\d]+].*LogWorld: SeamlessTravel to: .+\/([^\/]+)$/;
                 res = regex.exec(line);
                 if (res) {
-                    data.setNewCounterValue('layers', 150, res[ 2 ])
+                    data.setNewCounterValue('layers', 150, res[2])
                     return;
                 }
 
                 regex = /ApplyExplosiveDamage\(\).*DamageInstigator=([^ ]+PlayerController_C_\d+) /;
                 res = regex.exec(line);
                 if (res) {
-                    const playerController = res[ 1 ];
+                    const playerController = res[1];
 
                     if (this.options.PLAYER_CONTROLLER_FILTER == "" || this.options.PLAYER_CONTROLLER_FILTER == playerController)
                         data.incrementFrequencyCounter('frags', 1)
 
                     const explosionCountersPerController = data.getVar('explosionCountersPerController')
-                    if (!explosionCountersPerController[ playerController ]) explosionCountersPerController[ playerController ] = 0;
-                    explosionCountersPerController[ playerController ]++;
+                    if (!explosionCountersPerController[playerController]) explosionCountersPerController[playerController] = 0;
+                    explosionCountersPerController[playerController]++;
                     return;
                 }
 
                 regex = /ServerMove\: TimeStamp expired: ([\d\.]+), CurrentTimeStamp: ([\d\.]+), Character: (.+)/;
                 res = regex.exec(line);
                 if (res) {
-                    const timestampExpired = +res[ 1 ];
-                    const currentTimeStamp = +res[ 2 ];
+                    const timestampExpired = +res[1];
+                    const currentTimeStamp = +res[2];
                     const delta = currentTimeStamp - timestampExpired
-                    const playerName = data.getVar('pawnsToPlayerNames')[ res[ 3 ] ];
+                    const playerName = data.getVar('pawnsToPlayerNames')[res[3]];
                     const pawnToSteamID = data.getVar('pawnToSteamID')
-                    const steamID = pawnToSteamID[ res[ 3 ] ];
+                    const steamID = pawnToSteamID[res[3]];
                     const steamIDToPlayerController = data.getVar('steamIDToPlayerController')
                     const playerControllerHistory = steamIDToPlayerController.get(steamID);
-                    const lastPlayerController = [ ...playerControllerHistory ].pop();
+                    const lastPlayerController = [...playerControllerHistory].pop();
                     const playerNameToPlayerController = data.getVar('playerNameToPlayerController')
-                    const playerController = steamID ? lastPlayerController : playerNameToPlayerController[ playerName ]
+                    const playerController = steamID ? lastPlayerController : playerNameToPlayerController[playerName]
 
                     let unidentifiedPawns = data.getVar('UnidentifiedPawns');
                     if (!unidentifiedPawns) {
@@ -192,17 +192,17 @@ export default class Analyzer extends EventEmitter {
                     }
 
                     if (!playerController)
-                        unidentifiedPawns.add(`${res[ 3 ]} - ${playerName} - ${steamID} - ${playerController}`)
+                        unidentifiedPawns.add(`${res[3]} - ${playerName} - ${steamID} - ${playerController}`)
 
                     if (this.options.PLAYER_CONTROLLER_FILTER == "" || this.options.PLAYER_CONTROLLER_FILTER == playerController)
                         data.incrementFrequencyCounter('serverMove', 0.05)
 
                     const serverMoveTimestampExpiredPerController = data.getVar('serverMoveTimestampExpiredPerController')
                     if (delta > 150 || !this.options.ENABLE_TSEXPIRED_DELTA_CHECK) {
-                        if (!serverMoveTimestampExpiredPerController[ playerController ]) {
-                            serverMoveTimestampExpiredPerController[ playerController ] = 0;
+                        if (!serverMoveTimestampExpiredPerController[playerController]) {
+                            serverMoveTimestampExpiredPerController[playerController] = 0;
                         }
-                        serverMoveTimestampExpiredPerController[ playerController ]++;
+                        serverMoveTimestampExpiredPerController[playerController]++;
                     }
                     return;
                 }
@@ -231,14 +231,14 @@ export default class Analyzer extends EventEmitter {
                 regex = /\[(.+)\]\[([\s\d]+)\].+Client netspeed is (\d+)/;
                 res = regex.exec(line);
                 if (res) {
-                    data.setNewCounterValue('clientNetSpeed', (+res[ 3 ]) / 1000)
-                    data.getVar('UniqueClientNetSpeedValues').add(+res[ 3 ]);
+                    data.setNewCounterValue('clientNetSpeed', (+res[3]) / 1000)
+                    data.getVar('UniqueClientNetSpeedValues').add(+res[3]);
                     const playerControllerToNetspeed = data.getVar('playerControllerToNetspeed')
                     const chainIdToPlayerController = data.getVar('chainIdToPlayerController')
-                    const playerController = chainIdToPlayerController[ +res[ 2 ] ]
+                    const playerController = chainIdToPlayerController[+res[2]]
                     if (playerController) {
-                        if (!playerControllerToNetspeed[ playerController ]) playerControllerToNetspeed[ playerController ] = []
-                        playerControllerToNetspeed[ playerController ].push(+res[ 3 ])
+                        if (!playerControllerToNetspeed[playerController]) playerControllerToNetspeed[playerController] = []
+                        playerControllerToNetspeed[playerController].push(+res[3])
                     }
                     return;
                 }
@@ -248,13 +248,13 @@ export default class Analyzer extends EventEmitter {
                     res = regex.exec(line);
                     if (res) {
                         const pawnsToPlayerNames = data.getVar('pawnsToPlayerNames')
-                        pawnsToPlayerNames[ res[ 2 ] ] = res[ 1 ];
+                        pawnsToPlayerNames[res[2]] = res[1];
                         const playerNameToPlayerController = data.getVar('playerNameToPlayerController')
-                        const playerController = playerNameToPlayerController[ res[ 1 ] ];
+                        const playerController = playerNameToPlayerController[res[1]];
                         const playerControllerToSteamID = data.getVar('playerControllerToSteamID')
-                        const steamID = playerControllerToSteamID[ playerController ];
+                        const steamID = playerControllerToSteamID[playerController];
                         const pawnToSteamID = data.getVar('pawnToSteamID')
-                        pawnToSteamID[ res[ 2 ] ] = steamID;
+                        pawnToSteamID[res[2]] = steamID;
                     }
 
                     regex = /\[(.+)\]\[([\s\d]+)\]LogSquad: PostLogin: NewPlayer: [^ ]+PlayerController_C.+PersistentLevel\.(.+)/;
@@ -262,47 +262,47 @@ export default class Analyzer extends EventEmitter {
                     if (res) {
                         const chainIdToPlayerController = data.getVar('chainIdToPlayerController')
                         const connectionTimesByPlayerController = data.getVar('connectionTimesByPlayerController')
-                        chainIdToPlayerController[ +res[ 2 ] ] = res[ 3 ];
-                        connectionTimesByPlayerController[ res[ 3 ] ] = this.getDateTime(res[ 1 ])
+                        chainIdToPlayerController[+res[2]] = res[3];
+                        connectionTimesByPlayerController[res[3]] = this.getDateTime(res[1])
                     }
 
                     regex = /Die\(\): Player:.+from (.+) caused by (.+)/;
                     res = regex.exec(line);
                     if (res) {
-                        let playerController = res[ 1 ]
+                        let playerController = res[1]
                         if (!playerController || playerController == 'nullptr') {
                             const playerNameToPlayerController = data.getVar('playerNameToPlayerController')
                             const pawnsToPlayerNames = data.getVar('pawnsToPlayerNames')
-                            playerController = playerNameToPlayerController[ pawnsToPlayerNames[ res[ 2 ] ] ]
+                            playerController = playerNameToPlayerController[pawnsToPlayerNames[res[2]]]
                         }
 
                         if (this.options.PLAYER_CONTROLLER_FILTER == "" || this.options.PLAYER_CONTROLLER_FILTER == playerController)
                             data.incrementFrequencyCounter('PlayerKills', 1 / 5)
 
                         const killsPerPlayerController = data.getVar('killsPerPlayerController')
-                        if (!killsPerPlayerController[ playerController ]) killsPerPlayerController[ playerController ] = 0;
-                        killsPerPlayerController[ playerController ]++;
+                        if (!killsPerPlayerController[playerController]) killsPerPlayerController[playerController] = 0;
+                        killsPerPlayerController[playerController]++;
                         return;
                     }
                 } else {
                     regex = /^\[([0-9.:-]+)]\[([ 0-9]*)]LogSquad: PostLogin: NewPlayer: BP_PlayerController_C .+PersistentLevel\.(.+) \(IP: ([\d\.]+) \| Online IDs: EOS: (.+) steam: (\d+)\)/;
                     res = regex.exec(line);
                     if (res) {
-                        const playerController = res[ 3 ];
+                        const playerController = res[3];
 
                         const chainIdToPlayerController = data.getVar('chainIdToPlayerController')
                         const connectionTimesByPlayerController = data.getVar('connectionTimesByPlayerController')
-                        chainIdToPlayerController[ +res[ 2 ] ] = playerController;
-                        connectionTimesByPlayerController[ res[ 3 ] ] = this.getDateTime(res[ 1 ])
+                        chainIdToPlayerController[+res[2]] = playerController;
+                        connectionTimesByPlayerController[res[3]] = this.getDateTime(res[1])
 
-                        const steamID = res[ 6 ];
+                        const steamID = res[6];
                         const playerControllerToSteamID = data.getVar('playerControllerToSteamID')
-                        playerControllerToSteamID[ playerController ] = steamID;
+                        playerControllerToSteamID[playerController] = steamID;
 
                         const steamIDToPlayerController = data.getVar('steamIDToPlayerController')
                         const playerControllerHistory = steamIDToPlayerController.get(steamID);
                         if (!playerControllerHistory)
-                            steamIDToPlayerController.set(steamID, [ playerController ]);
+                            steamIDToPlayerController.set(steamID, [playerController]);
                         else
                             playerControllerHistory.push(playerController)
                     }
@@ -311,21 +311,21 @@ export default class Analyzer extends EventEmitter {
                     res = regex.exec(line);
                     if (res) {
                         const pawnToSteamID = data.getVar('pawnToSteamID')
-                        pawnToSteamID[ res[ 4 ] ] = res[ 3 ];
-                        data.getVar('pawnsToPlayerNames')[ res[ 4 ] ] = res[ 1 ];
+                        pawnToSteamID[res[4]] = res[3];
+                        data.getVar('pawnsToPlayerNames')[res[4]] = res[1];
                     }
 
                     regex = /^\[([0-9.:-]+)]\[([ 0-9]*)]LogSquadTrace: \[DedicatedServer](?:ASQSoldier::)?Die\(\): Player:(.+) KillingDamage=(?:-)*([0-9.]+) from ([A-z_0-9]+) \(Online IDs: EOS: ([\w\d]{32}) steam: (\d{17}) \| Contoller ID: ([\w\d]+)\) caused by ([A-z_0-9-]+)_C/;
                     res = regex.exec(line);
                     if (res) {
-                        let playerController = res[ 5 ]
+                        let playerController = res[5]
 
                         if (this.options.PLAYER_CONTROLLER_FILTER == "" || this.options.PLAYER_CONTROLLER_FILTER == playerController)
                             data.incrementFrequencyCounter('PlayerKills', 1 / 5)
 
                         const killsPerPlayerController = data.getVar('killsPerPlayerController')
-                        if (!killsPerPlayerController[ playerController ]) killsPerPlayerController[ playerController ] = 0;
-                        killsPerPlayerController[ playerController ]++;
+                        if (!killsPerPlayerController[playerController]) killsPerPlayerController[playerController] = 0;
+                        killsPerPlayerController[playerController]++;
                         return;
                     }
                 }
@@ -343,9 +343,9 @@ export default class Analyzer extends EventEmitter {
                     const playerNameToPlayerController = data.getVar('playerNameToPlayerController')
                     const chainIdToPlayerController = data.getVar('chainIdToPlayerController')
                     const playerControllerToPlayerName = data.getVar('playerControllerToPlayerName')
-                    playerNameToPlayerController[ res[ 3 ] ] = chainIdToPlayerController[ +res[ 2 ] ];
-                    playerControllerToPlayerName[ chainIdToPlayerController[ +res[ 2 ] ] ] = res[ 3 ];
-                    delete chainIdToPlayerController[ +res[ 2 ] ];
+                    playerNameToPlayerController[res[3]] = chainIdToPlayerController[+res[2]];
+                    playerControllerToPlayerName[chainIdToPlayerController[+res[2]]] = res[3];
+                    delete chainIdToPlayerController[+res[2]];
                     return;
                 }
 
@@ -353,17 +353,17 @@ export default class Analyzer extends EventEmitter {
                 res = regex.exec(line);
                 if (res) {
                     const chainIdToPlayerController = data.getVar('chainIdToPlayerController')
-                    const playerController = chainIdToPlayerController[ +res[ 1 ] ];
+                    const playerController = chainIdToPlayerController[+res[1]];
 
                     if (playerController) {
-                        const steamID = res[ 2 ];
+                        const steamID = res[2];
                         const playerControllerToSteamID = data.getVar('playerControllerToSteamID')
-                        playerControllerToSteamID[ playerController ] = steamID;
+                        playerControllerToSteamID[playerController] = steamID;
 
                         const steamIDToPlayerController = data.getVar('steamIDToPlayerController')
                         const playerControllerHistory = steamIDToPlayerController.get(steamID);
                         if (!playerControllerHistory)
-                            steamIDToPlayerController.set(steamID, [ playerController ]);
+                            steamIDToPlayerController.set(steamID, [playerController]);
                         else if (!playerControllerHistory.includes(playerController))
                             playerControllerHistory.push(playerController)
                     }
@@ -375,10 +375,10 @@ export default class Analyzer extends EventEmitter {
                 if (res) {
                     const fobHitsPerController = data.getVar('fobHitsPerController')
                     const steamIDToPlayerController = data.getVar('steamIDToPlayerController')
-                    const playerController = [ ...steamIDToPlayerController.get(res[ 2 ]) ].pop();
+                    const playerController = [...steamIDToPlayerController.get(res[2])].pop();
                     if (this.options.PLAYER_CONTROLLER_FILTER == "" || this.options.PLAYER_CONTROLLER_FILTER == playerController)
                         data.incrementFrequencyCounter('RadioHits', 0.1)
-                    fobHitsPerController[ playerController ] = (fobHitsPerController[ playerController ] || 0) + 1
+                    fobHitsPerController[playerController] = (fobHitsPerController[playerController] || 0) + 1
                     return;
                 }
 
@@ -427,7 +427,7 @@ export default class Analyzer extends EventEmitter {
                 regex = /Base Directory:.+\/([^\/]+)\/$/;
                 res = regex.exec(line);
                 if (res) {
-                    data.setVar('ServerOS', res[ 1 ])
+                    data.setVar('ServerOS', res[1])
                     return;
                 }
 
@@ -447,19 +447,31 @@ export default class Analyzer extends EventEmitter {
     }
 
     close() {
+        const data = this.#data;
+
+        const startTime = data.getVar('AnalysisStartTime')
+
+        const analysisEndTime = Date.now();
+        const analysisDurationMs = analysisEndTime - startTime
+        const analysisDuration = (analysisDurationMs / 1000).toFixed(1)
+
+        data.setVar('AnalysisEndTime', analysisEndTime)
+        data.setVar('AnalysisDurationMs', analysisDurationMs)
+        data.setVar('AnalysisDuration', analysisDuration)
+
         this.emit('close', this.#data)
         return this.#data;
     }
 
     getDateTime(date) {
         const parts = date.replace(/:\d+$/, '').replace(/-/, 'T').split('T');
-        parts[ 0 ] = parts[ 0 ].replace(/\./g, '-')
-        parts[ 1 ] = parts[ 1 ].replace(/\./g, ':')
+        parts[0] = parts[0].replace(/\./g, '-')
+        parts[1] = parts[1].replace(/\./g, ':')
         const res = `${parts.join('T')}Z`;
         return new Date(res)
     }
 
-    calcSeedingLiveTime(data, liveThreshold = 75, seedingMinThreshold = 2) {
+    calcSeedingLiveTime(data, liveThreshold = this.options.LIVE_THRESHOLD, seedingMinThreshold = this.options.SEEDING_MIN_THRESHOLD) {
         const prevAmountPlayersData = data.getCounterLastValue('players')
 
         if (!prevAmountPlayersData) return;
