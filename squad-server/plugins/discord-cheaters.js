@@ -104,7 +104,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
   async checkVersion() {
     const owner = 'IgnisAlienus';
     const repo = 'SquadJS-Cheater-Detection';
-    const currentVersion = 'v1.1.1';
+    const currentVersion = 'v1.1.2';
 
     try {
       const latestVersion = await getLatestVersion(owner, repo);
@@ -112,7 +112,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
       if (currentVersion !== latestVersion) {
         this.verbose(1, 'A new version is available. Please update your plugin.');
         this.sendDiscordMessage({
-          content: `A new version of \`SquadJS-Cheater-Detection\` is available. Please update your plugin. Current version: \`${currentVersion}\` [Latest version](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection): \`${latestVersion}\``
+          content: `A new version of \`SquadJS-Cheater-Detection\` is available. Please update your plugin. Current version: \`${currentVersion}\` [Latest version](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection/releases): \`${latestVersion}\``
         });
       } else {
         this.verbose(1, 'You are running the latest version.');
