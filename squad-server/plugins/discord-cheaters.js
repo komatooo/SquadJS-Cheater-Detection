@@ -104,7 +104,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
   async checkVersion() {
     const owner = 'IgnisAlienus';
     const repo = 'SquadJS-Cheater-Detection';
-    const currentVersion = 'v1.1.0';
+    const currentVersion = 'v1.1.1';
 
     try {
       const latestVersion = await getLatestVersion(owner, repo);
@@ -159,58 +159,154 @@ export default class DiscordCheaters extends DiscordBasePlugin {
     const analyzer = new Analyzer(data, options);
 
     analyzer.on('close', (data) => {
-      if (!data.getVar('ServerName'))
-        data.setVar('ServerName', fileNameNoExt);
+      if (!data.getVar('ServerName')) data.setVar('ServerName', fileNameNoExt);
 
-      const serverUptimeMs = (+data.timePoints[data.timePoints.length - 1].time - +data.timePoints[0].time);
+      const serverUptimeMs =
+        +data.timePoints[data.timePoints.length - 1].time - +data.timePoints[0].time;
       const serverUptimeHours = (serverUptimeMs / 1000 / 60 / 60).toFixed(1);
 
       const startTime = data.getVar('AnalysisStartTime');
       const totalEndTime = Date.now();
-      data.setVar('TotalEndTime', totalEndTime)
-      const analysisDuration = data.getVar('AnalysisDuration')
+      data.setVar('TotalEndTime', totalEndTime);
+      const analysisDuration = data.getVar('AnalysisDuration');
 
-      const totalDurationMs = totalEndTime - startTime
-      const totalDuration = (totalDurationMs / 1000).toFixed(1)
-      data.setVar('TotalDurationMs', totalDurationMs)
+      const totalDurationMs = totalEndTime - startTime;
+      const totalDuration = (totalDurationMs / 1000).toFixed(1);
+      data.setVar('TotalDurationMs', totalDurationMs);
       data.setVar('TotalDuration', totalDuration);
 
       const liveTime = (data.getVar('ServerLiveTime') / 1000 / 60 / 60).toFixed(1);
       const seedingTime = (data.getVar('ServerSeedingTime') / 1000 / 60 / 60).toFixed(1);
 
       let contentBuilding = [];
-      contentBuilding.push({ row: `### ${data.getVar('ServerName')} SERVER STAT REPORT: ${fileNameNoExt} ###` });
+      contentBuilding.push({
+        row: `### ${data.getVar('ServerName')} SERVER STAT REPORT: ${fileNameNoExt} ###`
+      });
       contentBuilding.push({ row: `# == Server CPU: ${data.getVar('ServerCPU')}` });
       contentBuilding.push({ row: `# == Server OS: ${data.getVar('ServerOS')}` });
       contentBuilding.push({ row: `# == Squad Version: ${data.getVar('ServerVersion')}` });
       contentBuilding.push({ row: `# == Server Uptime: ${serverUptimeHours} h` });
       contentBuilding.push({ row: `# == Server Seeding Time: ${seedingTime}` });
       contentBuilding.push({ row: `# == Server Live Time: ${liveTime}` });
-      contentBuilding.push({ row: `# == Host Closed Connections: ${data.getCounterData('hostClosedConnection').map((e) => e.y / 3).reduce((acc, curr) => acc + curr, 0)}` });
-      contentBuilding.push({ row: `# == Failed Queue Connections: ${data.getCounterData('queueDisconnections').map((e) => e.y / 3).reduce((acc, curr) => acc + curr, 0)}` });
-      contentBuilding.push({ row: `# == Steam Empty Tickets: ${data.getCounterData('steamEmptyTicket').map((e) => e.y).reduce((acc, curr) => acc + curr, 0)}` });
-      contentBuilding.push({ row: `# == Unique Client NetSpeed Values: ${[...data.getVar('UniqueClientNetSpeedValues').values()].join('; ')}` });
-      contentBuilding.push({ row: `# == Accepted Connection Lines: ${data.getCounterData('AcceptedConnection').map((e) => Math.round(e.y * 1000)).reduce((acc, curr) => acc + curr, 0)}` });
+      contentBuilding.push({
+        row: `# == Host Closed Connections: ${data
+          .getCounterData('hostClosedConnection')
+          .map((e) => e.y / 3)
+          .reduce((acc, curr) => acc + curr, 0)}`
+      });
+      contentBuilding.push({
+        row: `# == Failed Queue Connections: ${data
+          .getCounterData('queueDisconnections')
+          .map((e) => e.y / 3)
+          .reduce((acc, curr) => acc + curr, 0)}`
+      });
+      contentBuilding.push({
+        row: `# == Steam Empty Tickets: ${data
+          .getCounterData('steamEmptyTicket')
+          .map((e) => e.y)
+          .reduce((acc, curr) => acc + curr, 0)}`
+      });
+      contentBuilding.push({
+        row: `# == Unique Client NetSpeed Values: ${[
+          ...data.getVar('UniqueClientNetSpeedValues').values()
+        ].join('; ')}`
+      });
+      contentBuilding.push({
+        row: `# == Accepted Connection Lines: ${data
+          .getCounterData('AcceptedConnection')
+          .map((e) => Math.round(e.y * 1000))
+          .reduce((acc, curr) => acc + curr, 0)}`
+      });
       contentBuilding.push({ row: `# == Analysis duration: ${analysisDuration}s` });
       contentBuilding.push({ row: `# == Total duration: ${totalDuration}s` });
-      contentBuilding.push({ row: `### ${data.getVar('ServerName')} SUSPECTED CHEATER REPORT: ${fileNameNoExt} ###` });
+      contentBuilding.push({
+        row: `### ${data.getVar('ServerName')} SUSPECTED CHEATER REPORT: ${fileNameNoExt} ###`
+      });
 
-      this.verbose(1, `\n\x1b[1m\x1b[34m### ${data.getVar('ServerName')} SERVER STAT REPORT: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`);
-      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Name:\x1b[0m ${data.getVar('ServerName')}`);
-      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer CPU:\x1b[0m ${data.getVar('ServerCPU')}`);
-      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer OS:\x1b[0m ${data.getVar('ServerOS')}`);
-      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mSquad Version:\x1b[0m ${data.getVar('ServerVersion')}`);
-      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Uptime:\x1b[0m ${serverUptimeHours} h`);
-      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Live Time:\x1b[0m ${liveTime} h`);
-      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Seeding Time:\x1b[0m ${seedingTime} h`);
-      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mHost Closed Connections:\x1b[0m ${data.getCounterData('hostClosedConnection').map((e) => e.y / 3).reduce((acc, curr) => acc + curr, 0)}`);
-      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mFailed Queue Connections:\x1b[0m ${data.getCounterData('queueDisconnections').map((e) => e.y / 3).reduce((acc, curr) => acc + curr, 0)}`);
-      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mSteam Empty Tickets:\x1b[0m ${data.getCounterData('steamEmptyTicket').map((e) => e.y).reduce((acc, curr) => acc + curr, 0)}`);
-      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mUnique Client NetSpeed Values:\x1b[0m ${[...data.getVar('UniqueClientNetSpeedValues').values()].join('; ')}`);
-      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mAccepted Connection Lines:\x1b[0m ${data.getCounterData('AcceptedConnection').map((e) => Math.round(e.y * 1000)).reduce((acc, curr) => acc + curr, 0)}`);
-      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mAnalysis duration:\x1b[0m ${analysisDuration}s`);
-      this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mTotal duration:\x1b[0m ${totalDuration}s`);
-      this.verbose(1, `\x1b[1m\x1b[34m### CHEATING REPORT: \x1b[32m${data.getVar('ServerName')}\x1b[34m ###\x1b[0m`);
+      this.verbose(
+        1,
+        `\n\x1b[1m\x1b[34m### ${data.getVar(
+          'ServerName'
+        )} SERVER STAT REPORT: \x1b[32m${fileNameNoExt}\x1b[34m ###\x1b[0m`
+      );
+      this.verbose(
+        1,
+        `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Name:\x1b[0m ${data.getVar('ServerName')}`
+      );
+      this.verbose(
+        1,
+        `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer CPU:\x1b[0m ${data.getVar('ServerCPU')}`
+      );
+      this.verbose(
+        1,
+        `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer OS:\x1b[0m ${data.getVar('ServerOS')}`
+      );
+      this.verbose(
+        1,
+        `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mSquad Version:\x1b[0m ${data.getVar(
+          'ServerVersion'
+        )}`
+      );
+      this.verbose(
+        1,
+        `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Uptime:\x1b[0m ${serverUptimeHours} h`
+      );
+      this.verbose(
+        1,
+        `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Live Time:\x1b[0m ${liveTime} h`
+      );
+      this.verbose(
+        1,
+        `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mServer Seeding Time:\x1b[0m ${seedingTime} h`
+      );
+      this.verbose(
+        1,
+        `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mHost Closed Connections:\x1b[0m ${data
+          .getCounterData('hostClosedConnection')
+          .map((e) => e.y / 3)
+          .reduce((acc, curr) => acc + curr, 0)}`
+      );
+      this.verbose(
+        1,
+        `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mFailed Queue Connections:\x1b[0m ${data
+          .getCounterData('queueDisconnections')
+          .map((e) => e.y / 3)
+          .reduce((acc, curr) => acc + curr, 0)}`
+      );
+      this.verbose(
+        1,
+        `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mSteam Empty Tickets:\x1b[0m ${data
+          .getCounterData('steamEmptyTicket')
+          .map((e) => e.y)
+          .reduce((acc, curr) => acc + curr, 0)}`
+      );
+      this.verbose(
+        1,
+        `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mUnique Client NetSpeed Values:\x1b[0m ${[
+          ...data.getVar('UniqueClientNetSpeedValues').values()
+        ].join('; ')}`
+      );
+      this.verbose(
+        1,
+        `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mAccepted Connection Lines:\x1b[0m ${data
+          .getCounterData('AcceptedConnection')
+          .map((e) => Math.round(e.y * 1000))
+          .reduce((acc, curr) => acc + curr, 0)}`
+      );
+      this.verbose(
+        1,
+        `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mAnalysis duration:\x1b[0m ${analysisDuration}s`
+      );
+      this.verbose(
+        1,
+        `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mTotal duration:\x1b[0m ${totalDuration}s`
+      );
+      this.verbose(
+        1,
+        `\x1b[1m\x1b[34m### CHEATING REPORT: \x1b[32m${data.getVar(
+          'ServerName'
+        )}\x1b[34m ###\x1b[0m`
+      );
       const cheaters = {
         Explosions: data.getVar('explosionCountersPerController'),
         ServerMoveTimeStampExpired: data.getVar('serverMoveTimestampExpiredPerController'),
@@ -286,24 +382,44 @@ export default class DiscordCheaters extends DiscordBasePlugin {
               suspectedCheaters.add(playerSteamID);
               this.uniqueRowsSet.add(row);
               contentBuilding.push({ row });
-              this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m  > \x1b[33m${playerSteamID}\x1b[90m ${playerController}\x1b[37m ${playerName}\x1b[90m: \x1b[91m${cheaters[cK][playerId]}\x1b[0m`);
+              this.verbose(
+                1,
+                `\x1b[1m\x1b[34m#\x1b[0m  > \x1b[33m${playerSteamID}\x1b[90m ${playerController}\x1b[37m ${playerName}\x1b[90m: \x1b[91m${cheaters[cK][playerId]}\x1b[0m`
+              );
             }
           }
         }
       }
       if (suspectedCheaters.size === 0) {
-        this.verbose(1, `\x1b[1m\x1b[34m### NO SUSPECTED CHEATERS FOUND: \x1b[32m${data.getVar('ServerName')}\x1b[34m ###\x1b[0m`);
+        this.verbose(
+          1,
+          `\x1b[1m\x1b[34m### NO SUSPECTED CHEATERS FOUND: \x1b[32m${data.getVar(
+            'ServerName'
+          )}\x1b[34m ###\x1b[0m`
+        );
         return;
       } else {
-        contentBuilding.push({ row: `### SUSPECTED CHEATERS SESSIONS: ${data.getVar('ServerName')} ###` });
-        this.verbose(1, `\x1b[1m\x1b[34m### SUSPECTED CHEATERS SESSIONS: \x1b[32m${data.getVar('ServerName')}\x1b[34m ###\x1b[0m`
+        contentBuilding.push({
+          row: `### SUSPECTED CHEATERS SESSIONS: ${data.getVar('ServerName')} ###`
+        });
+        this.verbose(
+          1,
+          `\x1b[1m\x1b[34m### SUSPECTED CHEATERS SESSIONS: \x1b[32m${data.getVar(
+            'ServerName'
+          )}\x1b[34m ###\x1b[0m`
         );
         let suspectedCheatersNames = [];
         for (let playerSteamID of suspectedCheaters) {
-          const disconnectionTimesByPlayerController = data.getVar('disconnectionTimesByPlayerController');
-          const connectionTimesByPlayerController = data.getVar('connectionTimesByPlayerController');
+          const disconnectionTimesByPlayerController = data.getVar(
+            'disconnectionTimesByPlayerController'
+          );
+          const connectionTimesByPlayerController = data.getVar(
+            'connectionTimesByPlayerController'
+          );
           const explosionCountersPerController = data.getVar('explosionCountersPerController');
-          const serverMoveTimestampExpiredPerController = data.getVar('serverMoveTimestampExpiredPerController');
+          const serverMoveTimestampExpiredPerController = data.getVar(
+            'serverMoveTimestampExpiredPerController'
+          );
           const playerControllerToNetspeed = data.getVar('playerControllerToNetspeed');
           const killsPerPlayerController = data.getVar('killsPerPlayerController');
           const fobHitsPerController = data.getVar('fobHitsPerController');
@@ -315,30 +431,73 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           suspectedCheatersNames.push(playerName);
 
           contentBuilding.push({ row: `# == ${playerSteamID} | ${playerName}` });
-          this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[33m${playerSteamID} \x1b[37m${playerName}\x1b[90m`);
+          this.verbose(
+            1,
+            `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[33m${playerSteamID} \x1b[37m${playerName}\x1b[90m`
+          );
 
           for (let playerController of playerControllerHistory) {
-            let stringifiedConnectionTime = connectionTimesByPlayerController[playerController].toLocaleString();
-            let stringifiedDisconnectionTime = disconnectionTimesByPlayerController[playerController]?.toLocaleString() || 'N/A';
+            let stringifiedConnectionTime =
+              connectionTimesByPlayerController[playerController].toLocaleString();
+            let stringifiedDisconnectionTime =
+              disconnectionTimesByPlayerController[playerController]?.toLocaleString() || 'N/A';
 
-            contentBuilding.push({ row: `#  >  ${playerController}: (${stringifiedConnectionTime} - ${stringifiedDisconnectionTime})` });
-            contentBuilding.push({ row: `#  >>>>>${explosionCountersPerController[playerController] || 0} Explosions, ${serverMoveTimestampExpiredPerController[playerController] || 0} ServerMoveTimeStampExpired, ${playerControllerToNetspeed[playerController] || 0} ClientNetSpeed, ${killsPerPlayerController[playerController] || 0} Kills, ${fobHitsPerController[playerController] || 0} FOB Hits` });
-            this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m  > \x1b[90m ${playerController}\x1b[90m: \x1b[37m(${stringifiedConnectionTime} - ${stringifiedDisconnectionTime})\x1b[90m`);
-            this.verbose(1, `\x1b[1m\x1b[34m#\x1b[0m  >>>>> \x1b[91m${explosionCountersPerController[playerController] || 0} Explosions, ${serverMoveTimestampExpiredPerController[playerController] || 0} ServerMoveTimeStampExpired, ${playerControllerToNetspeed[playerController] || 0} ClientNetSpeed, ${killsPerPlayerController[playerController] || 0} Kills, ${fobHitsPerController[playerController] || 0} FOB Hits\x1b[0m`);
+            contentBuilding.push({
+              row: `#  >  ${playerController}: (${stringifiedConnectionTime} - ${stringifiedDisconnectionTime})`
+            });
+            contentBuilding.push({
+              row: `#  >>>>>${explosionCountersPerController[playerController] || 0} Explosions, ${
+                serverMoveTimestampExpiredPerController[playerController] || 0
+              } ServerMoveTimeStampExpired, ${
+                playerControllerToNetspeed[playerController] || 0
+              } ClientNetSpeed, ${killsPerPlayerController[playerController] || 0} Kills, ${
+                fobHitsPerController[playerController] || 0
+              } FOB Hits`
+            });
+            this.verbose(
+              1,
+              `\x1b[1m\x1b[34m#\x1b[0m  > \x1b[90m ${playerController}\x1b[90m: \x1b[37m(${stringifiedConnectionTime} - ${stringifiedDisconnectionTime})\x1b[90m`
+            );
+            this.verbose(
+              1,
+              `\x1b[1m\x1b[34m#\x1b[0m  >>>>> \x1b[91m${
+                explosionCountersPerController[playerController] || 0
+              } Explosions, ${
+                serverMoveTimestampExpiredPerController[playerController] || 0
+              } ServerMoveTimeStampExpired, ${
+                playerControllerToNetspeed[playerController] || 0
+              } ClientNetSpeed, ${killsPerPlayerController[playerController] || 0} Kills, ${
+                fobHitsPerController[playerController] || 0
+              } FOB Hits\x1b[0m`
+            );
           }
         }
 
         const unidentifiedPawns = data.getVar('UnidentifiedPawns');
         if (unidentifiedPawns?.size > 0) {
-          this.verbose(1, `\x1b[1m\x1b[34m### UNIDENTIFIED PAWNS: \x1b[32m${data.getVar('ServerName')}\x1b[34m ###\x1b[0m`);
-          contentBuilding.push({ row: `#### UNIDENTIFIED PAWNS: ${data.getVar('ServerName')} ###` });
+          this.verbose(
+            1,
+            `\x1b[1m\x1b[34m### UNIDENTIFIED PAWNS: \x1b[32m${data.getVar(
+              'ServerName'
+            )}\x1b[34m ###\x1b[0m`
+          );
+          contentBuilding.push({
+            row: `#### UNIDENTIFIED PAWNS: ${data.getVar('ServerName')} ###`
+          });
           for (let pawn of unidentifiedPawns) {
             this.verbose(1, `\x1b[ 1m\x1b[ 34m#\x1b[ 0m == \x1b[ 1m${pawn} \x1b[ 0m`);
             contentBuilding.push({ row: `# == ${pawn}` });
           }
         }
-        contentBuilding.push({ row: `#### FINISHED ALL REPORTS: ${data.getVar('ServerName')} ###` });
-        this.verbose(1, `\x1b[1m\x1b[34m### FINISHED ALL REPORTS: \x1b[32m${data.getVar('ServerName')}\x1b[34m ###\x1b[0m`);
+        contentBuilding.push({
+          row: `#### FINISHED ALL REPORTS: ${data.getVar('ServerName')} ###`
+        });
+        this.verbose(
+          1,
+          `\x1b[1m\x1b[34m### FINISHED ALL REPORTS: \x1b[32m${data.getVar(
+            'ServerName'
+          )}\x1b[34m ###\x1b[0m`
+        );
 
         let pingables = 'Supsected Cheater Report for Review';
         if (this.options.pingGroups.length > 0) {
