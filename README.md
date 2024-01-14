@@ -34,11 +34,12 @@
 - If any Suspected Cheaters are found, it pushes it to a configurable Discord Channel.
 
 ## Detection Methods and the Possible False Positives
+For More info on what each line means in the Output, please visit: https://www.guardianonlybans.com/logcheck-info
 - `Explosions`: it's possible for someone to be a false positive on explosions particularly if they're driving around an armor piece such as a BTR spamming HE.
 - `ServerMoveTimeStampExpired`: it's possible for someone to be a false positive on this if they lag a lot or have high ping.
 - `ClientNetSpeed`: Unknown if tied to Cheaters yet. Set Threshold to `0` to Disable.
-- `Kills`: this one it's obviously possible for false positives on good players.
-- `FOBHits`: damage to a FOB Radio. Restricted to only what is logged currently in the logs.
+- `Kills`: This one it's obviously possible for false positives on good players. Set to `0` by Default to Disable
+- `FOBHits`: Damage to a FOB Radio. Restricted to only what is logged currently in the logs.
 
 ## What in the world is `ServerMoveTimeStampExpired`???
 - The best explanation I can find is from `{ASG} Skillet` in OWI Hosting Discord.
