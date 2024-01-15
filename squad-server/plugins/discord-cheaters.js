@@ -59,12 +59,12 @@ export default class DiscordCheaters extends DiscordBasePlugin {
       clientNetSpeedThreshold: {
         required: true,
         description: 'Client Net Speed Threshold.',
-        example: 1800
+        example: 18000
       },
-      killsThreshold: {
+      knifeWoundsThreshold: {
         required: true,
-        description: 'Kills Detection Threshold.',
-        example: 200
+        description: 'Knife Wounds Detection Threshold.',
+        example: 15
       },
       fobHitsThreshold: {
         required: true,
@@ -104,7 +104,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
   async checkVersion() {
     const owner = 'IgnisAlienus';
     const repo = 'SquadJS-Cheater-Detection';
-    const currentVersion = 'v1.1.2';
+    const currentVersion = 'v1.2.0';
 
     try {
       const latestVersion = await getLatestVersion(owner, repo);
@@ -311,7 +311,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
         Explosions: data.getVar('explosionCountersPerController'),
         ServerMoveTimeStampExpired: data.getVar('serverMoveTimestampExpiredPerController'),
         ClientNetSpeed: data.getVar('playerControllerToNetspeed'),
-        Kills: data.getVar('killsPerPlayerController'),
+        KnifeWounds: data.getVar('knifeWoundsPerPlayerController'),
         FOBHits: data.getVar('fobHitsPerController')
       };
 
@@ -340,11 +340,11 @@ export default class DiscordCheaters extends DiscordBasePlugin {
               minCount = this.options.clientNetSpeedThreshold;
               break;
             }
-          case 'Kills':
-            if (this.options.killsThreshold === 0) {
+          case 'KnifeWounds':
+            if (this.options.knifeWoundsThreshold === 0) {
               break;
             } else {
-              minCount = this.options.killsThreshold;
+              minCount = this.options.knifeWoundsThreshold;
               break;
             }
           case 'FOBHits':
@@ -422,6 +422,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           );
           const playerControllerToNetspeed = data.getVar('playerControllerToNetspeed');
           const killsPerPlayerController = data.getVar('killsPerPlayerController');
+          const knifeWoundsPerPlayerController = data.getVar('knifeWoundsPerPlayerController');
           const fobHitsPerController = data.getVar('fobHitsPerController');
           const steamIDToPlayerController = data.getVar('steamIDToPlayerController');
           const playerControllerHistory = steamIDToPlayerController.get(playerSteamID);
@@ -446,13 +447,10 @@ export default class DiscordCheaters extends DiscordBasePlugin {
               row: `#  >  ${playerController}: (${stringifiedConnectionTime} - ${stringifiedDisconnectionTime})`
             });
             contentBuilding.push({
-              row: `#  >>>>>${explosionCountersPerController[playerController] || 0} Explosions, ${
-                serverMoveTimestampExpiredPerController[playerController] || 0
-              } ServerMoveTimeStampExpired, ${
-                playerControllerToNetspeed[playerController] || 0
-              } ClientNetSpeed, ${killsPerPlayerController[playerController] || 0} Kills, ${
-                fobHitsPerController[playerController] || 0
-              } FOB Hits`
+              row: `#  >>>>>${explosionCountersPerController[playerController] || 0} Explosions, ${serverMoveTimestampExpiredPerController[playerController] || 0
+                } ServerMoveTimeStampExpired, ${playerControllerToNetspeed[playerController] || 0
+                } ClientNetSpeed, ${killsPerPlayerController[playerController] || 0} Kills, ${knifeWoundsPerPlayerController[playerController] || 0} Knife Wounds, ${fobHitsPerController[playerController] || 0
+                } FOB Hits`
             });
             this.verbose(
               1,
@@ -460,14 +458,10 @@ export default class DiscordCheaters extends DiscordBasePlugin {
             );
             this.verbose(
               1,
-              `\x1b[1m\x1b[34m#\x1b[0m  >>>>> \x1b[91m${
-                explosionCountersPerController[playerController] || 0
-              } Explosions, ${
-                serverMoveTimestampExpiredPerController[playerController] || 0
-              } ServerMoveTimeStampExpired, ${
-                playerControllerToNetspeed[playerController] || 0
-              } ClientNetSpeed, ${killsPerPlayerController[playerController] || 0} Kills, ${
-                fobHitsPerController[playerController] || 0
+              `\x1b[1m\x1b[34m#\x1b[0m  >>>>> \x1b[91m${explosionCountersPerController[playerController] || 0
+              } Explosions, ${serverMoveTimestampExpiredPerController[playerController] || 0
+              } ServerMoveTimeStampExpired, ${playerControllerToNetspeed[playerController] || 0
+              } ClientNetSpeed, ${killsPerPlayerController[playerController] || 0} Kills, ${knifeWoundsPerPlayerController[playerController] || 0} Knife Wounds, ${fobHitsPerController[playerController] || 0
               } FOB Hits\x1b[0m`
             );
           }

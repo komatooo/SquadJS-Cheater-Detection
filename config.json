@@ -10,7 +10,7 @@
     "explosionThreshold": 200,
     "serverMoveTimeStampExpiredThreshold": 1000,
     "clientNetSpeedThreshold": 18000,
-    "killsThreshold": 0,
+    "knifeWoundsThreshold": 15,
     "fobHitsThreshold": 100,
     "liveThreshold": 50,
     "seedingMinThreshold": 5
