@@ -104,7 +104,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
   async checkVersion() {
     const owner = 'IgnisAlienus';
     const repo = 'SquadJS-Cheater-Detection';
-    const currentVersion = 'v1.2.0';
+    const currentVersion = 'v1.2.1';
 
     try {
       const latestVersion = await getLatestVersion(owner, repo);
@@ -212,7 +212,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
         ].join('; ')}`
       });
       contentBuilding.push({
-        row: `# == Accepted Connection Lines: ${data
+        row: `# == Accepted Connection Lines (Cap is 50,000): ${data
           .getCounterData('AcceptedConnection')
           .map((e) => Math.round(e.y * 1000))
           .reduce((acc, curr) => acc + curr, 0)}`
@@ -288,7 +288,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
       );
       this.verbose(
         1,
-        `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mAccepted Connection Lines:\x1b[0m ${data
+        `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mAccepted Connection Lines (Cap is 50,000):\x1b[0m ${data
           .getCounterData('AcceptedConnection')
           .map((e) => Math.round(e.y * 1000))
           .reduce((acc, curr) => acc + curr, 0)}`
