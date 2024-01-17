@@ -30,9 +30,24 @@ export default class DiscordCheaters extends DiscordBasePlugin {
         default: [],
         example: ['500455137626554379']
       },
-      channelID: {
+      enableFullLog: {
         required: true,
-        description: 'The ID of the channel to log to.',
+        description: 'Should the full log be sent to Discord.',
+        example: true
+      },
+      enableEmbed: {
+        required: true,
+        description: 'Should the embed be sent to Discord.',
+        example: true
+      },
+      color: {
+        required: false,
+        description: 'The color of the embed.',
+        default: 16761867
+      },
+      channelID: {
+        required: false,
+        description: 'The ID of the channel to send messages to.',
         default: '',
         example: '667741905228136459'
       },
@@ -104,7 +119,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
   async checkVersion() {
     const owner = 'IgnisAlienus';
     const repo = 'SquadJS-Cheater-Detection';
-    const currentVersion = 'v1.2.1';
+    const currentVersion = 'v1.3.0';
 
     try {
       const latestVersion = await getLatestVersion(owner, repo);
@@ -464,6 +479,50 @@ export default class DiscordCheaters extends DiscordBasePlugin {
               } ClientNetSpeed, ${killsPerPlayerController[playerController] || 0} Kills, ${knifeWoundsPerPlayerController[playerController] || 0} Knife Wounds, ${fobHitsPerController[playerController] || 0
               } FOB Hits\x1b[0m`
             );
+
+            if (this.options.enableEmbed) {
+              const markdownField = `\`\`\`# == ${playerSteamID} | ${playerName}
+# > ${playerController}: (${stringifiedConnectionTime} - ${stringifiedDisconnectionTime}
+#  >>>>>${explosionCountersPerController[playerController] || 0} Explosions
+#  >>>>>${serverMoveTimestampExpiredPerController[playerController] || 0} ServerMoveTimeStampExpired
+#  >>>>>${playerControllerToNetspeed[playerController] || 0} ClientNetSpeed
+#  >>>>>${killsPerPlayerController[playerController] || 0} Kills
+#  >>>>>${knifeWoundsPerPlayerController[playerController] || 0} Knife Wounds
+#  >>>>>${fobHitsPerController[playerController] || 0} FOB Hits
+\`\`\``;
+              const message = {
+                embed: {
+                  title: `Suspected Cheater Identified`,
+                  description: `*Suspected* Cheaters are not always Cheaters. Always verify with recorded in-game footage if possible. Get with https://discord.gg/onlybans to go over the results in more detail if you are not sure.`,
+                  color: this.options.color,
+                  fields: [
+                    {
+                      name: "SteamID",
+                      value: `[${playerSteamID}](https://steamcommunity.com/profiles/${playerSteamID})`,
+                      inline: true
+                    },
+                    {
+                      name: "Player Name",
+                      value: playerName,
+                      inline: true
+                    },
+                    {
+                      name: "Battlemetrics Player Profile",
+                      value: `[Battlemetris Player Profile](https://www.battlemetrics.com/rcon/players?filter[search]=${playerSteamID}&method=quick&redirect=1)`,
+                      inline: false
+                    },
+                    {
+                      name: "Suspected Cheater Data",
+                      value: markdownField,
+                      inline: false
+                    }
+                  ],
+                  timestamp: info.time.toISOString()
+                }
+              };
+
+              this.sendDiscordMessage(message)
+            }
           }
         }
 
@@ -505,28 +564,30 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           content: `${pingables}\nJust because a "SUSPECTED CHEATER" is list in the Output does NOT *always* guarantee they are a Cheater. Verify with recorded in-game footage if possible. Get with https://discord.gg/onlybans to go over the results in more detail if you are not sure.\n\nFor more information on what each line means in the output, please visit: https://www.guardianonlybans.com/logcheck-info`
         });
 
-        for (const item of contentBuilding) {
-          const row = item.row + '\n';
+        if (this.options.enableFullLog) {
+          for (const item of contentBuilding) {
+            const row = item.row + '\n';
 
-          if (currentMessage.length + row.length <= maxCharacterLimit) {
-            // If adding the row doesn't exceed the character limit, add it to the current message
-            currentMessage += row;
-          } else {
-            // If adding the row exceeds the character limit, send the current message
+            if (currentMessage.length + row.length <= maxCharacterLimit) {
+              // If adding the row doesn't exceed the character limit, add it to the current message
+              currentMessage += row;
+            } else {
+              // If adding the row exceeds the character limit, send the current message
+              this.sendDiscordMessage({
+                content: `\`\`\`\n${currentMessage}\n\`\`\``
+              });
+
+              // Start a new message with the current row
+              currentMessage = row;
+            }
+          }
+
+          // Send the remaining message if any
+          if (currentMessage.length > 0) {
             this.sendDiscordMessage({
               content: `\`\`\`\n${currentMessage}\n\`\`\``
             });
-
-            // Start a new message with the current row
-            currentMessage = row;
           }
-        }
-
-        // Send the remaining message if any
-        if (currentMessage.length > 0) {
-          this.sendDiscordMessage({
-            content: `\`\`\`\n${currentMessage}\n\`\`\``
-          });
         }
 
         this.warnInGameAdmins(suspectedCheatersNames);
