@@ -71,11 +71,11 @@ export default class DiscordCheaters extends DiscordBasePlugin {
         description: 'ServerMoveTimeStampExpired Detection Threshold.',
         example: 3000
       },
-      clientNetSpeedThreshold: {
+/*       clientNetSpeedThreshold: {
         required: true,
         description: 'Client Net Speed Threshold.',
         example: 18000
-      },
+      }, */
       knifeWoundsThreshold: {
         required: true,
         description: 'Knife Wounds Detection Threshold.',
@@ -228,11 +228,11 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           .map((e) => e.y)
           .reduce((acc, curr) => acc + curr, 0)}`
       });
-      contentBuilding.push({
+/*       contentBuilding.push({
         row: `# == Unique Client NetSpeed Values: ${[
           ...data.getVar('UniqueClientNetSpeedValues').values()
         ].join('; ')}`
-      });
+      }); */
       contentBuilding.push({
         row: `# == Accepted Connection Lines (Cap is 50,000): ${data
           .getCounterData('AcceptedConnection')
@@ -302,12 +302,12 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           .map((e) => e.y)
           .reduce((acc, curr) => acc + curr, 0)}`
       );
-      this.verbose(
+/*       this.verbose(
         1,
         `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mUnique Client NetSpeed Values:\x1b[0m ${[
           ...data.getVar('UniqueClientNetSpeedValues').values()
         ].join('; ')}`
-      );
+      ); */
       this.verbose(
         1,
         `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mAccepted Connection Lines (Cap is 50,000):\x1b[0m ${data
@@ -332,7 +332,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
       const cheaters = {
         Explosions: data.getVar('explosionCountersPerController'),
         ServerMoveTimeStampExpired: data.getVar('serverMoveTimestampExpiredPerController'),
-        ClientNetSpeed: data.getVar('playerControllerToNetspeed'),
+        //ClientNetSpeed: data.getVar('playerControllerToNetspeed'),
         KnifeWounds: data.getVar('knifeWoundsPerPlayerController'),
         FOBHits: data.getVar('fobHitsPerController')
       };
@@ -355,13 +355,13 @@ export default class DiscordCheaters extends DiscordBasePlugin {
               minCount = this.options.serverMoveTimeStampExpiredThreshold;
               break;
             }
-          case 'ClientNetSpeed':
+          /* case 'ClientNetSpeed':
             if (this.options.clientNetSpeedThreshold === 0) {
               break;
             } else {
               minCount = this.options.clientNetSpeedThreshold;
               break;
-            }
+            } */
           case 'KnifeWounds':
             if (this.options.knifeWoundsThreshold === 0) {
               break;
