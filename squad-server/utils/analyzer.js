@@ -485,6 +485,8 @@ export default class Analyzer extends EventEmitter {
           // Check if the frequency counter has reached the cap
           if (data.getVar('AcceptedConnection') < cap) {
             data.incrementFrequencyCounter('AcceptedConnection', 0.001);
+          } else if (data.getVar('AcceptedConnection') >= cap && data.getVar('AcceptedConnection') !== 'DDoS Suspected in Log File') {
+            data.setVar('AcceptedConnection', 'DDoS Suspected in Log File');
           }
           return;
         }
