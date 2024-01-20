@@ -119,7 +119,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
   async checkVersion() {
     const owner = 'IgnisAlienus';
     const repo = 'SquadJS-Cheater-Detection';
-    const currentVersion = 'v1.3.1';
+    const currentVersion = 'v1.4.0';
 
     try {
       const latestVersion = await getLatestVersion(owner, repo);
