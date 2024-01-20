@@ -74,6 +74,9 @@ I don't think there is anything firm tying it to cheating. I think the thought p
 ## Example Discord Output
 ![Example](https://raw.githubusercontent.com/IgnisAlienus/SquadJS-Cheater-Detection/master/example-discord-output.png)
 
+## Example Discord Embed Output
+![Exampe](https://raw.githubusercontent.com/IgnisAlienus/SquadJS-Cheater-Detection/master/example-embed-output.png)
+
 ## Example Console Output
 ![Example](https://raw.githubusercontent.com/IgnisAlienus/SquadJS-Cheater-Detection/master/example-console-output.png)
 
