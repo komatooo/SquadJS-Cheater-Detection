@@ -30,9 +30,24 @@ export default class DiscordCheaters extends DiscordBasePlugin {
         default: [],
         example: ['500455137626554379']
       },
-      channelID: {
+      enableFullLog: {
         required: true,
-        description: 'The ID of the channel to log to.',
+        description: 'Should the full log be sent to Discord.',
+        example: true
+      },
+      enableEmbed: {
+        required: true,
+        description: 'Should the embed be sent to Discord.',
+        example: true
+      },
+      color: {
+        required: false,
+        description: 'The color of the embed.',
+        default: 16711680
+      },
+      channelID: {
+        required: false,
+        description: 'The ID of the channel to send messages to.',
         default: '',
         example: '667741905228136459'
       },
@@ -56,11 +71,11 @@ export default class DiscordCheaters extends DiscordBasePlugin {
         description: 'ServerMoveTimeStampExpired Detection Threshold.',
         example: 3000
       },
-      clientNetSpeedThreshold: {
+/*       clientNetSpeedThreshold: {
         required: true,
         description: 'Client Net Speed Threshold.',
         example: 18000
-      },
+      }, */
       knifeWoundsThreshold: {
         required: true,
         description: 'Knife Wounds Detection Threshold.',
@@ -104,18 +119,25 @@ export default class DiscordCheaters extends DiscordBasePlugin {
   async checkVersion() {
     const owner = 'IgnisAlienus';
     const repo = 'SquadJS-Cheater-Detection';
-    const currentVersion = 'v1.2.1';
+    const currentVersion = 'v1.3.1';
 
     try {
       const latestVersion = await getLatestVersion(owner, repo);
 
-      if (currentVersion !== latestVersion) {
+      if (currentVersion < latestVersion) {
         this.verbose(1, 'A new version is available. Please update your plugin.');
         this.sendDiscordMessage({
-          content: `A new version of \`SquadJS-Cheater-Detection\` is available. Please update your plugin. Current version: \`${currentVersion}\` [Latest version](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection/releases): \`${latestVersion}\``
+          content: `A new version of \`SquadJS-Cheater-Detection\` is available. Please update your plugin.\nCurrent version: \`${currentVersion}\` [Latest version](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection/releases): \`${latestVersion}\``
         });
-      } else {
+      } else if (currentVersion > latestVersion) {
+        this.verbose(1, 'You are running a newer version than the latest version.');
+        this.sendDiscordMessage({
+          content: `You are running a newer version of \`SquadJS-Cheater-Detection\` than the latest version.\nThis likely means you are running a pre-release version.\nCurrent version: \`${currentVersion}\` [Latest version](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection/releases): \`${latestVersion}\``
+        });
+      } else if (currentVersion === latestVersion){
         this.verbose(1, 'You are running the latest version.');
+      } else {
+        this.verbose(1, 'Unable to check for updates.');
       }
     } catch (error) {
       this.verbose(1, 'Error retrieving the latest version:', error);
@@ -206,11 +228,11 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           .map((e) => e.y)
           .reduce((acc, curr) => acc + curr, 0)}`
       });
-      contentBuilding.push({
+/*       contentBuilding.push({
         row: `# == Unique Client NetSpeed Values: ${[
           ...data.getVar('UniqueClientNetSpeedValues').values()
         ].join('; ')}`
-      });
+      }); */
       contentBuilding.push({
         row: `# == Accepted Connection Lines (Cap is 50,000): ${data
           .getCounterData('AcceptedConnection')
@@ -280,12 +302,12 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           .map((e) => e.y)
           .reduce((acc, curr) => acc + curr, 0)}`
       );
-      this.verbose(
+/*       this.verbose(
         1,
         `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mUnique Client NetSpeed Values:\x1b[0m ${[
           ...data.getVar('UniqueClientNetSpeedValues').values()
         ].join('; ')}`
-      );
+      ); */
       this.verbose(
         1,
         `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mAccepted Connection Lines (Cap is 50,000):\x1b[0m ${data
@@ -310,7 +332,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
       const cheaters = {
         Explosions: data.getVar('explosionCountersPerController'),
         ServerMoveTimeStampExpired: data.getVar('serverMoveTimestampExpiredPerController'),
-        ClientNetSpeed: data.getVar('playerControllerToNetspeed'),
+        //ClientNetSpeed: data.getVar('playerControllerToNetspeed'),
         KnifeWounds: data.getVar('knifeWoundsPerPlayerController'),
         FOBHits: data.getVar('fobHitsPerController')
       };
@@ -333,13 +355,13 @@ export default class DiscordCheaters extends DiscordBasePlugin {
               minCount = this.options.serverMoveTimeStampExpiredThreshold;
               break;
             }
-          case 'ClientNetSpeed':
+          /* case 'ClientNetSpeed':
             if (this.options.clientNetSpeedThreshold === 0) {
               break;
             } else {
               minCount = this.options.clientNetSpeedThreshold;
               break;
-            }
+            } */
           case 'KnifeWounds':
             if (this.options.knifeWoundsThreshold === 0) {
               break;
@@ -448,8 +470,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
             });
             contentBuilding.push({
               row: `#  >>>>>${explosionCountersPerController[playerController] || 0} Explosions, ${serverMoveTimestampExpiredPerController[playerController] || 0
-                } ServerMoveTimeStampExpired, ${playerControllerToNetspeed[playerController] || 0
-                } ClientNetSpeed, ${killsPerPlayerController[playerController] || 0} Kills, ${knifeWoundsPerPlayerController[playerController] || 0} Knife Wounds, ${fobHitsPerController[playerController] || 0
+                } ServerMoveTimeStampExpired, ${killsPerPlayerController[playerController] || 0} Kills, ${knifeWoundsPerPlayerController[playerController] || 0} Knife Wounds, ${fobHitsPerController[playerController] || 0
                 } FOB Hits`
             });
             this.verbose(
@@ -460,10 +481,52 @@ export default class DiscordCheaters extends DiscordBasePlugin {
               1,
               `\x1b[1m\x1b[34m#\x1b[0m  >>>>> \x1b[91m${explosionCountersPerController[playerController] || 0
               } Explosions, ${serverMoveTimestampExpiredPerController[playerController] || 0
-              } ServerMoveTimeStampExpired, ${playerControllerToNetspeed[playerController] || 0
-              } ClientNetSpeed, ${killsPerPlayerController[playerController] || 0} Kills, ${knifeWoundsPerPlayerController[playerController] || 0} Knife Wounds, ${fobHitsPerController[playerController] || 0
+              } ServerMoveTimeStampExpired, ${killsPerPlayerController[playerController] || 0} Kills, ${knifeWoundsPerPlayerController[playerController] || 0} Knife Wounds, ${fobHitsPerController[playerController] || 0
               } FOB Hits\x1b[0m`
             );
+
+            if (this.options.enableEmbed) {
+              const markdownField = `\`\`\`# == ${playerSteamID} | ${playerName}
+# > ${playerController}: (${stringifiedConnectionTime} - ${stringifiedDisconnectionTime}
+#  >>>>>${explosionCountersPerController[playerController] || 0} Explosions
+#  >>>>>${serverMoveTimestampExpiredPerController[playerController] || 0} ServerMoveTimeStampExpired
+#  >>>>>${killsPerPlayerController[playerController] || 0} Kills
+#  >>>>>${knifeWoundsPerPlayerController[playerController] || 0} Knife Wounds
+#  >>>>>${fobHitsPerController[playerController] || 0} FOB Hits
+\`\`\``;
+              const message = {
+                embed: {
+                  title: `Suspected Cheater Identified`,
+                  description: `*Suspected* Cheaters are not always Cheaters. Always verify with recorded in-game footage if possible. Get with https://discord.gg/onlybans to go over the results in more detail if you are not sure.`,
+                  color: this.options.color,
+                  fields: [
+                    {
+                      name: "SteamID",
+                      value: `[${playerSteamID}](https://steamcommunity.com/profiles/${playerSteamID})`,
+                      inline: true
+                    },
+                    {
+                      name: "Player Name",
+                      value: playerName,
+                      inline: true
+                    },
+                    {
+                      name: "Battlemetrics Player Profile",
+                      value: `[Battlemetris Player Profile](https://www.battlemetrics.com/rcon/players?filter[search]=${playerSteamID}&method=quick&redirect=1)`,
+                      inline: false
+                    },
+                    {
+                      name: "Suspected Cheater Data",
+                      value: markdownField,
+                      inline: false
+                    }
+                  ],
+                  timestamp: new Date(),
+                }
+              };
+
+              this.sendDiscordMessage(message)
+            }
           }
         }
 
@@ -505,28 +568,30 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           content: `${pingables}\nJust because a "SUSPECTED CHEATER" is list in the Output does NOT *always* guarantee they are a Cheater. Verify with recorded in-game footage if possible. Get with https://discord.gg/onlybans to go over the results in more detail if you are not sure.\n\nFor more information on what each line means in the output, please visit: https://www.guardianonlybans.com/logcheck-info`
         });
 
-        for (const item of contentBuilding) {
-          const row = item.row + '\n';
+        if (this.options.enableFullLog) {
+          for (const item of contentBuilding) {
+            const row = item.row + '\n';
 
-          if (currentMessage.length + row.length <= maxCharacterLimit) {
-            // If adding the row doesn't exceed the character limit, add it to the current message
-            currentMessage += row;
-          } else {
-            // If adding the row exceeds the character limit, send the current message
+            if (currentMessage.length + row.length <= maxCharacterLimit) {
+              // If adding the row doesn't exceed the character limit, add it to the current message
+              currentMessage += row;
+            } else {
+              // If adding the row exceeds the character limit, send the current message
+              this.sendDiscordMessage({
+                content: `\`\`\`\n${currentMessage}\n\`\`\``
+              });
+
+              // Start a new message with the current row
+              currentMessage = row;
+            }
+          }
+
+          // Send the remaining message if any
+          if (currentMessage.length > 0) {
             this.sendDiscordMessage({
               content: `\`\`\`\n${currentMessage}\n\`\`\``
             });
-
-            // Start a new message with the current row
-            currentMessage = row;
           }
-        }
-
-        // Send the remaining message if any
-        if (currentMessage.length > 0) {
-          this.sendDiscordMessage({
-            content: `\`\`\`\n${currentMessage}\n\`\`\``
-          });
         }
 
         this.warnInGameAdmins(suspectedCheatersNames);
