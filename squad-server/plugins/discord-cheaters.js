@@ -442,8 +442,8 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           const serverMoveTimestampExpiredPerController = data.getVar(
             'serverMoveTimestampExpiredPerController'
           );
-          const playerControllerToNetspeed = data.getVar('playerControllerToNetspeed');
-          const killsPerPlayerController = data.getVar('killsPerPlayerController');
+          // const playerControllerToNetspeed = data.getVar('playerControllerToNetspeed');
+          // const killsPerPlayerController = data.getVar('killsPerPlayerController');
           const knifeWoundsPerPlayerController = data.getVar('knifeWoundsPerPlayerController');
           const fobHitsPerController = data.getVar('fobHitsPerController');
           const steamIDToPlayerController = data.getVar('steamIDToPlayerController');
@@ -470,7 +470,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
             });
             contentBuilding.push({
               row: `#  >>>>>${explosionCountersPerController[playerController] || 0} Explosions, ${serverMoveTimestampExpiredPerController[playerController] || 0
-                } ServerMoveTimeStampExpired, ${killsPerPlayerController[playerController] || 0} Kills, ${knifeWoundsPerPlayerController[playerController] || 0} Knife Wounds, ${fobHitsPerController[playerController] || 0
+                } ServerMoveTimeStampExpired, ${knifeWoundsPerPlayerController[playerController] || 0} Knife Wounds, ${fobHitsPerController[playerController] || 0
                 } FOB Hits`
             });
             this.verbose(
@@ -481,7 +481,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
               1,
               `\x1b[1m\x1b[34m#\x1b[0m  >>>>> \x1b[91m${explosionCountersPerController[playerController] || 0
               } Explosions, ${serverMoveTimestampExpiredPerController[playerController] || 0
-              } ServerMoveTimeStampExpired, ${killsPerPlayerController[playerController] || 0} Kills, ${knifeWoundsPerPlayerController[playerController] || 0} Knife Wounds, ${fobHitsPerController[playerController] || 0
+              } ServerMoveTimeStampExpired, ${knifeWoundsPerPlayerController[playerController] || 0} Knife Wounds, ${fobHitsPerController[playerController] || 0
               } FOB Hits\x1b[0m`
             );
 
@@ -490,7 +490,6 @@ export default class DiscordCheaters extends DiscordBasePlugin {
 # > ${playerController}: (${stringifiedConnectionTime} - ${stringifiedDisconnectionTime}
 #  >>>>>${explosionCountersPerController[playerController] || 0} Explosions
 #  >>>>>${serverMoveTimestampExpiredPerController[playerController] || 0} ServerMoveTimeStampExpired
-#  >>>>>${killsPerPlayerController[playerController] || 0} Kills
 #  >>>>>${knifeWoundsPerPlayerController[playerController] || 0} Knife Wounds
 #  >>>>>${fobHitsPerController[playerController] || 0} FOB Hits
 \`\`\``;
