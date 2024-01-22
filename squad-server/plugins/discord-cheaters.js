@@ -127,12 +127,12 @@ export default class DiscordCheaters extends DiscordBasePlugin {
       if (currentVersion < latestVersion) {
         this.verbose(1, 'A new version is available. Please update your plugin.');
         this.sendDiscordMessage({
-          content: `A new version of \`SquadJS-Cheater-Detection\` is available. Please update your plugin.\nCurrent version: \`${currentVersion}\` [Latest version](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection/releases): \`${latestVersion}\``
+          content: `A new version of \`${repo}\` is available. Please update your plugin.\nCurrent version: \`${currentVersion}\` [Latest version](https://github.com/${owner}/${repo}/releases): \`${latestVersion}\``
         });
       } else if (currentVersion > latestVersion) {
         this.verbose(1, 'You are running a newer version than the latest version.');
         this.sendDiscordMessage({
-          content: `You are running a newer version of \`SquadJS-Cheater-Detection\` than the latest version.\nThis likely means you are running a pre-release version.\nCurrent version: \`${currentVersion}\` [Latest version](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection/releases): \`${latestVersion}\``
+          content: `You are running a newer version of \`${repo}\` than the latest version.\nThis likely means you are running a pre-release version.\nCurrent version: \`${currentVersion}\` [Latest version](https://github.com/${owner}/${repo}/releases): \`${latestVersion}\``
         });
       } else if (currentVersion === latestVersion){
         this.verbose(1, 'You are running the latest version.');
