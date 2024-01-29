@@ -19,11 +19,6 @@ export default class DiscordCheaters extends DiscordBasePlugin {
   static get optionsSpecification() {
     return {
       ...DiscordBasePlugin.optionsSpecification,
-      logDir: {
-        required: true,
-        description: 'Squad Log Directory.',
-        example: 'c:/SquadGame/Saved/Logs'
-      },
       pingGroups: {
         required: true,
         description: 'A list of Discord role IDs to ping.',
@@ -71,7 +66,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
         description: 'ServerMoveTimeStampExpired Detection Threshold.',
         example: 3000
       },
-/*       clientNetSpeedThreshold: {
+      /*       clientNetSpeedThreshold: {
         required: true,
         description: 'Client Net Speed Threshold.',
         example: 18000
@@ -127,14 +122,14 @@ export default class DiscordCheaters extends DiscordBasePlugin {
       if (currentVersion < latestVersion) {
         this.verbose(1, 'A new version is available. Please update your plugin.');
         this.sendDiscordMessage({
-          content: `A new version of \`${repo}\` is available. Please update your plugin.\nCurrent version: \`${currentVersion}\` [Latest version](https://github.com/${owner}/${repo}/releases): \`${latestVersion}\``
+          content: `A new version of \`SquadJS-Cheater-Detection\` is available. Please update your plugin.\nCurrent version: \`${currentVersion}\` [Latest version](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection/releases): \`${latestVersion}\``
         });
       } else if (currentVersion > latestVersion) {
         this.verbose(1, 'You are running a newer version than the latest version.');
         this.sendDiscordMessage({
-          content: `You are running a newer version of \`${repo}\` than the latest version.\nThis likely means you are running a pre-release version.\nCurrent version: \`${currentVersion}\` [Latest version](https://github.com/${owner}/${repo}/releases): \`${latestVersion}\``
+          content: `You are running a newer version of \`SquadJS-Cheater-Detection\` than the latest version.\nThis likely means you are running a pre-release version.\nCurrent version: \`${currentVersion}\` [Latest version](https://github.com/IgnisAlienus/SquadJS-Cheater-Detection/releases): \`${latestVersion}\``
         });
-      } else if (currentVersion === latestVersion){
+      } else if (currentVersion === latestVersion) {
         this.verbose(1, 'You are running the latest version.');
       } else {
         this.verbose(1, 'Unable to check for updates.');
@@ -145,7 +140,8 @@ export default class DiscordCheaters extends DiscordBasePlugin {
   }
 
   async cheaterCheck() {
-    const logDirectory = this.options.logDir;
+    const logDirectory = this.server.options.logDir;
+    console.log(this.server.options.logDir)
     const logFile = fs.readdirSync(logDirectory).find((f) => f.endsWith('SquadGame.log'));
 
     if (!logFile) {
@@ -228,7 +224,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           .map((e) => e.y)
           .reduce((acc, curr) => acc + curr, 0)}`
       });
-/*       contentBuilding.push({
+      /*       contentBuilding.push({
         row: `# == Unique Client NetSpeed Values: ${[
           ...data.getVar('UniqueClientNetSpeedValues').values()
         ].join('; ')}`
@@ -302,7 +298,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           .map((e) => e.y)
           .reduce((acc, curr) => acc + curr, 0)}`
       );
-/*       this.verbose(
+      /*       this.verbose(
         1,
         `\x1b[1m\x1b[34m#\x1b[0m == \x1b[1m\x1b[31mUnique Client NetSpeed Values:\x1b[0m ${[
           ...data.getVar('UniqueClientNetSpeedValues').values()
@@ -442,8 +438,8 @@ export default class DiscordCheaters extends DiscordBasePlugin {
           const serverMoveTimestampExpiredPerController = data.getVar(
             'serverMoveTimestampExpiredPerController'
           );
-          // const playerControllerToNetspeed = data.getVar('playerControllerToNetspeed');
-          // const killsPerPlayerController = data.getVar('killsPerPlayerController');
+          const playerControllerToNetspeed = data.getVar('playerControllerToNetspeed');
+          const killsPerPlayerController = data.getVar('killsPerPlayerController');
           const knifeWoundsPerPlayerController = data.getVar('knifeWoundsPerPlayerController');
           const fobHitsPerController = data.getVar('fobHitsPerController');
           const steamIDToPlayerController = data.getVar('steamIDToPlayerController');
@@ -469,9 +465,13 @@ export default class DiscordCheaters extends DiscordBasePlugin {
               row: `#  >  ${playerController}: (${stringifiedConnectionTime} - ${stringifiedDisconnectionTime})`
             });
             contentBuilding.push({
-              row: `#  >>>>>${explosionCountersPerController[playerController] || 0} Explosions, ${serverMoveTimestampExpiredPerController[playerController] || 0
-                } ServerMoveTimeStampExpired, ${knifeWoundsPerPlayerController[playerController] || 0} Knife Wounds, ${fobHitsPerController[playerController] || 0
-                } FOB Hits`
+              row: `#  >>>>>${explosionCountersPerController[playerController] || 0} Explosions, ${
+                serverMoveTimestampExpiredPerController[playerController] || 0
+              } ServerMoveTimeStampExpired, ${
+                killsPerPlayerController[playerController] || 0
+              } Kills, ${knifeWoundsPerPlayerController[playerController] || 0} Knife Wounds, ${
+                fobHitsPerController[playerController] || 0
+              } FOB Hits`
             });
             this.verbose(
               1,
@@ -479,9 +479,14 @@ export default class DiscordCheaters extends DiscordBasePlugin {
             );
             this.verbose(
               1,
-              `\x1b[1m\x1b[34m#\x1b[0m  >>>>> \x1b[91m${explosionCountersPerController[playerController] || 0
-              } Explosions, ${serverMoveTimestampExpiredPerController[playerController] || 0
-              } ServerMoveTimeStampExpired, ${knifeWoundsPerPlayerController[playerController] || 0} Knife Wounds, ${fobHitsPerController[playerController] || 0
+              `\x1b[1m\x1b[34m#\x1b[0m  >>>>> \x1b[91m${
+                explosionCountersPerController[playerController] || 0
+              } Explosions, ${
+                serverMoveTimestampExpiredPerController[playerController] || 0
+              } ServerMoveTimeStampExpired, ${
+                killsPerPlayerController[playerController] || 0
+              } Kills, ${knifeWoundsPerPlayerController[playerController] || 0} Knife Wounds, ${
+                fobHitsPerController[playerController] || 0
               } FOB Hits\x1b[0m`
             );
 
@@ -490,6 +495,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
 # > ${playerController}: (${stringifiedConnectionTime} - ${stringifiedDisconnectionTime}
 #  >>>>>${explosionCountersPerController[playerController] || 0} Explosions
 #  >>>>>${serverMoveTimestampExpiredPerController[playerController] || 0} ServerMoveTimeStampExpired
+#  >>>>>${killsPerPlayerController[playerController] || 0} Kills
 #  >>>>>${knifeWoundsPerPlayerController[playerController] || 0} Knife Wounds
 #  >>>>>${fobHitsPerController[playerController] || 0} FOB Hits
 \`\`\``;
@@ -500,31 +506,31 @@ export default class DiscordCheaters extends DiscordBasePlugin {
                   color: this.options.color,
                   fields: [
                     {
-                      name: "SteamID",
+                      name: 'SteamID',
                       value: `[${playerSteamID}](https://steamcommunity.com/profiles/${playerSteamID})`,
                       inline: true
                     },
                     {
-                      name: "Player Name",
+                      name: 'Player Name',
                       value: playerName,
                       inline: true
                     },
                     {
-                      name: "Battlemetrics Player Profile",
+                      name: 'Battlemetrics Player Profile',
                       value: `[Battlemetris Player Profile](https://www.battlemetrics.com/rcon/players?filter[search]=${playerSteamID}&method=quick&redirect=1)`,
                       inline: false
                     },
                     {
-                      name: "Suspected Cheater Data",
+                      name: 'Suspected Cheater Data',
                       value: markdownField,
                       inline: false
                     }
                   ],
-                  timestamp: new Date(),
+                  timestamp: new Date()
                 }
               };
 
-              this.sendDiscordMessage(message)
+              this.sendDiscordMessage(message);
             }
           }
         }
