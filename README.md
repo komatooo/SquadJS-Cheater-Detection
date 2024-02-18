@@ -25,7 +25,6 @@
     - Drop `analyzer.js` in `./squad-server/utils`
     - Drop `data-store.js` in `./squad-server/utils`
 - Customize your `config.json` Settings.
-    - `logDir` - This is the path to your SquadGame.log
     - `pingGroups` - Leave it as `[]` if you don't want to ping Admins if Suspected Cheaters are found.
         - If you do wish to ping admins, use as many, or as little, Role IDs as you wish: `"pingGroups":  ["723400310667870230", "550182386219089921"],`
         - Only Pings on `enableFullLog`, not on `enableEmbed`.

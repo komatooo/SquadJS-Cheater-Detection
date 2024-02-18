@@ -2,7 +2,6 @@
     "plugin": "DiscordCheaters",
     "enabled": true,
     "discordClient": "discord",
-    "logDir": "C:/ALL Game Servers/Squad Servers/Third Squad Server/SquadGame/Saved/Logs",
     "pingGroups":  [],
     "enableFullLog": true,
     "enableEmbed": true,
