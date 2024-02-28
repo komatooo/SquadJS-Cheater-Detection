@@ -90,7 +90,12 @@ export default class DiscordCheaters extends DiscordBasePlugin {
         required: true,
         description: 'Server Minimum Player Count for Seeding',
         example: 5
-      }
+      },
+      logfilename: {
+        required: false,
+        description: 'Log filename',
+        default: 'SquadGame.log'
+      },
     };
   }
 
@@ -141,7 +146,7 @@ export default class DiscordCheaters extends DiscordBasePlugin {
 
   async cheaterCheck() {
     const logDirectory = this.server.options.logDir;
-    const fileName = this.server.options.filename ? this.server.options.filename : 'SquadGame.log';
+    const fileName = this.options.logfilename ? this.options.logfilename : 'SquadGame.log';
     console.log(this.server.options.logDir);
     console.log(fileName);
     const logFile = fs.readdirSync(logDirectory).find((f) => f.endsWith(fileName));
